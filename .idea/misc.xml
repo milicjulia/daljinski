@@ -5,6 +5,14 @@
       <map>
         <entry key="..\:/Users/Julija/Desktop/daljinski/app/src/main/res/drawable/ic_launcher_background.xml" value="0.266" />
         <entry key="..\:/Users/Julija/Desktop/daljinski/app/src/main/res/layout/activity_main.xml" value="0.4" />
+        <entry key="..\:/Users/juliam/Desktop/daljinski/daljinski-main/app/src/main/res/drawable/button_oval.xml" value="0.177" />
+        <entry key="..\:/Users/juliam/Desktop/daljinski/daljinski-main/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/juliam/Desktop/daljinski/daljinski-main/app/src/main/res/layout/fragment_channel.xml" value="0.33" />
+        <entry key="..\:/Users/juliam/Desktop/daljinski/daljinski-main/app/src/main/res/layout/fragment_meni.xml" value="0.1" />
+        <entry key="..\:/Users/juliam/Desktop/daljinski/daljinski-main/app/src/main/res/layout/fragment_one_channel.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/juliam/Desktop/daljinski/daljinski-main/app/src/main/res/layout/fragment_opcije.xml" value="0.1" />
+        <entry key="..\:/Users/juliam/Desktop/daljinski/daljinski-main/app/src/main/res/layout/fragment_program.xml" value="0.1" />
+        <entry key="..\:/Users/juliam/Desktop/daljinski/daljinski-main/app/src/main/res/layout/fragment_timeline.xml" value="0.33" />
       </map>
     </option>
   </component>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:id="@+id/timeline">
+
+        <!-- the circular icon on the left -->
+        <ImageView
+            android:id="@+id/channel_picture"
+            android:background="@drawable/rts"
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            />
+
+    <HorizontalScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <!-- the blue line -->
+        <FrameLayout
+            android:id="@+id/linija"
+            android:layout_width="15dp"
+            android:layout_height="match_parent"
+            android:padding="2dp"
+            >
+        </FrameLayout>
+
+        <!-- views at the right of the blue line -->
+        <FrameLayout
+            android:id="@+id/kanal"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:orientation="horizontal"
+            tools:ignore="SpeakableTextPresentCheck">
+            <include layout="@layout/fragment_program" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/kanal1"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:orientation="horizontal"
+            tools:ignore="SpeakableTextPresentCheck">
+            <include layout="@layout/fragment_program" />
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/kanal2"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:clickable="true">
+            <include layout="@layout/fragment_program" />
+        </FrameLayout>
+</LinearLayout>
+    </HorizontalScrollView>
+    </LinearLayout>
+
+
+
