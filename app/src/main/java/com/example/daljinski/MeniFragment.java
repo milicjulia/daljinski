@@ -23,7 +23,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
 
-public class MeniFragment extends Fragment implements RecognitionListener {
+public class MeniFragment extends Fragment implements RecognitionListener{
     private Button chUp, chDown, volUp, volDown, S;
 
     public static int getVolume() {
@@ -53,6 +53,7 @@ public class MeniFragment extends Fragment implements RecognitionListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         view= inflater.inflate(R.layout.fragment_meni, container, false);
+		
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_INTERNET);
         }
@@ -122,24 +123,30 @@ public class MeniFragment extends Fragment implements RecognitionListener {
         if(channel!=1)
             channel-=1;
         txt2.setText(String.valueOf(channel));
+		MainActivity.sendMessageToSTB("CHDOWN");
     }
 
     public void channelUp(){
         channel+=1;
         txt2.setText(String.valueOf(channel));
+		MainActivity.sendMessageToSTB("CHUP");
     }
 
     public void volumeDown(){
         if(volume<=100 && volume>=5)
             volume-=5;
         txt1.setText(String.valueOf(volume));
+		MainActivity.sendMessageToSTB("VOLDOWN");
     }
 
     public void volumeUp(){
         if(volume<=95 && volume>=0)
             volume+=5;
         txt1.setText(String.valueOf(volume));
+		MainActivity.sendMessageToSTB("VOLUP");
     }
+	
+	
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -283,4 +290,8 @@ public class MeniFragment extends Fragment implements RecognitionListener {
         super.onStop();
         Log.d("mess","stop");
     }
+	
+	
+	
+
 }

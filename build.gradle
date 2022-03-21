@@ -1,7 +1,16 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    dependencies {
+        classpath 'com.android.tools.build:gradle:5.6.4-beta02'
+    }
+    repositories {
+        google()
+    }
+}
+
 plugins {
-    id 'com.android.application' version '7.1.2' apply false
-    id 'com.android.library' version '7.1.2' apply false
+    id 'com.android.application' version '5.6.4' apply false
+    id 'com.android.library' version '5.6.4' apply false
 }
 
 

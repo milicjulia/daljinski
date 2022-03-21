@@ -49,6 +49,7 @@ View view;
             public void onClick(View view) {
                 Log.d("mess","menja");
                 MeniFragment.setChannel(1);
+				MainActivity.sendMessageToSTB("GOTOCH",myid);
             }
         });
         return view;
