@@ -1,5 +1,4 @@
 package com.example.daljinski;
-
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -36,4 +35,6 @@ public class ChannelFragment extends Fragment {
         });
         return view;
     }
+	
+	
 }

@@ -1,5 +1,4 @@
 package com.example.daljinski;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
@@ -21,12 +20,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 
 public class TimelineFragment extends Fragment {

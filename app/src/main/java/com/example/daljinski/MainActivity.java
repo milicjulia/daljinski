@@ -4,7 +4,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -36,6 +35,8 @@ public class MainActivity extends AppCompatActivity, STBTaskListenner, ComServic
     private List<TimelineFragment> timelines=new ArrayList<TimelineFragment>();
 	public final static int COMMUNICATION_PORT = 2000;
 	//STBRemoteControlCommunication stbrcc;
+	private ArrayList<JSONObject> channels = new ArrayList<>();
+	private JSONObject user;
 	
 	private CommunicationServiceConnection serviceConnection;    
 	private boolean connected;
@@ -47,6 +48,16 @@ public class MainActivity extends AppCompatActivity, STBTaskListenner, ComServic
 		serviceConnection = new CommunicationServiceConnection(this);
 		stbrcc = new STBRemoteControlCommunication(this);
 	    //stbrcc.doBindService();
+		
+		 try {
+            JSONArray channelsArray = new JSONArray(loadJSONFromAsset("channels.json"));
+			user = new JSONObject(loadJSONFromAsset("user.json"));
+            for (int i = 0; i < channelsArray.length(); i++) {
+                channels.add(channelsArray.getJSONObject(i));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         meni1=(Button) findViewById(R.id.meni1);
         meni2=(Button) findViewById(R.id.meni2);
@@ -163,6 +174,30 @@ public class MainActivity extends AppCompatActivity, STBTaskListenner, ComServic
 	@Override
 	public void serviceUnbind() {
 		connected = false;
+	}
+	
+	public String loadJSONFromAsset(String path) {
+        String json = null;
+        try {
+            InputStream is = getAssets().open(path);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
+	
+	public ArrayList<JSONObject> getChannels(){
+		return channels;
+	}
+	
+	public JSONObject getUser(){
+		return user;
 	}
 
 }

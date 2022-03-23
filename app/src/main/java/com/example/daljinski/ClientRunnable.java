@@ -8,8 +8,7 @@ import java.net.Socket;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import fr.enseirb.odroidx.remote_server.communication.Commands;
-import fr.enseirb.odroidx.remote_server.service.RemoteControlService;
+import RemoteControlService;
 
 public class ClientRunnable implements Runnable {
 

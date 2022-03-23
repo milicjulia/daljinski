@@ -1,5 +1,4 @@
 package com.example.daljinski;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
@@ -17,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;

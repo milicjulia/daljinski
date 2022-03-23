@@ -2,7 +2,7 @@ package com.example.daljinski;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-//import fr.enseirb.odroidx.remote_client.communication.CommunicationService.CommunicationBinder;
+import CommunicationBinder;
 
 public class CommunicationServiceConnection implements ServiceConnection {
 

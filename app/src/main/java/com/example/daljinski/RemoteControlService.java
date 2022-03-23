@@ -1,8 +1,5 @@
 package com.example.daljinski;
-//package fr.enseirb.odroidx.remote_server.service;
-
 import java.util.ArrayList;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,8 +9,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-import fr.enseirb.odroidx.remote_server.MainActivity;
-import fr.enseirb.odroidx.remote_server.bkg_work.ServerRunnable;
+import MainActivity;
+import ServerRunnable;
 
 public class RemoteControlService extends Service {
 	

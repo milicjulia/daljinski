@@ -1,11 +1,10 @@
 package com.example.daljinski;
-//import fr.enseirb.odroidx.remote_client.communication.STBCommunicationTask.STBTaskListenner;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-public class CommunicationService extends Service implements STBTaskListenner {
+public class CommunicationService extends Service{
 	
 	private final IBinder communicationBinder = new CommunicationBinder(); 
 	private STBCommunication stbDriver = new STBCommunication();
