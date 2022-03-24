@@ -23,19 +23,26 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class MainActivity extends AppCompatActivity, STBTaskListenner, ComServiceListenner  {
     private Button meni1, meni2, meni3;
     private List<TimelineFragment> timelines=new ArrayList<TimelineFragment>();
 	public final static int COMMUNICATION_PORT = 2000;
 	//STBRemoteControlCommunication stbrcc;
-	private ArrayList<JSONObject> channels = new ArrayList<>();
+	private ArrayList<Channel> channels = new ArrayList<>();
 	private JSONObject user;
 	
 	private CommunicationServiceConnection serviceConnection;    
@@ -49,15 +56,7 @@ public class MainActivity extends AppCompatActivity, STBTaskListenner, ComServic
 		stbrcc = new STBRemoteControlCommunication(this);
 	    //stbrcc.doBindService();
 		
-		 try {
-            JSONArray channelsArray = new JSONArray(loadJSONFromAsset("channels.json"));
-			user = new JSONObject(loadJSONFromAsset("user.json"));
-            for (int i = 0; i < channelsArray.length(); i++) {
-                channels.add(channelsArray.getJSONObject(i));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+		ucitajJSON();
 
         meni1=(Button) findViewById(R.id.meni1);
         meni2=(Button) findViewById(R.id.meni2);
@@ -176,21 +175,89 @@ public class MainActivity extends AppCompatActivity, STBTaskListenner, ComServic
 		connected = false;
 	}
 	
-	public String loadJSONFromAsset(String path) {
-        String json = null;
-        try {
-            InputStream is = getAssets().open(path);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
+	public void ucitajJSON(String path) {
+       String path="C:\\Users\\Julija\\Documents\\GitHub\\daljinski\\app\\src\\main\\res\\drawable\\channels.json";
+      	JSONParser jsonParser = new JSONParser();
+          
+          try (FileReader reader = new FileReader(path))
+          {
+              Object obj = jsonParser.parse(reader);
+              JSONArray channelsList = (JSONArray) obj;
+              
+              for(int i=0;i<channelsList.size();i++) {
+              m1.channels.add(m1.parseChannelObject((JSONObject)channelsList.get(i)));
+            
+              }
+              
+   
+          } catch (FileNotFoundException e) {
+              e.printStackTrace();
+          } catch (IOException e) {
+              e.printStackTrace();
+          } catch (ParseException e) {
+              e.printStackTrace();
+          }
     }
+	
+	public  Program parseProgramObject(JSONObject program) 
+    {
+		
+		String objectType=(String)program.get("objectType");
+		long createDate=(long)program.get("createDate");
+		String description=(String)program.get("description");
+		long endDate=(long)program.get("endDate");
+		String externalId=(String)program.get("externalId");
+		long id=(long)program.get("id");
+		ArrayList<String> images= new ArrayList<>();
+		JSONArray imagesArray = (JSONArray) program.get("images");
+		for(int i=0;i<imagesArray.size();i++) images.add((String)((JSONObject)imagesArray.get(i)).get("url"));
+		JSONObject metas= (JSONObject)program.get("metas");
+		long rating=Integer.parseInt((String)((JSONObject)metas.get("rating")).get("value"));
+		long year;
+		if((JSONObject)metas.get("year")==null) year=0;
+		else year=Integer.parseInt((String)((JSONObject)metas.get("year")).get("value"));
+		String name=(String)program.get("name");
+		long startDate=(long)program.get("startDate");
+		JSONObject tags= (JSONObject)program.get("tags");
+		ArrayList<String> country= new ArrayList<>();
+		JSONObject countryObject= (JSONObject)tags.get("country");
+		JSONArray objectArray;
+		if(countryObject!=null) {
+		objectArray = (JSONArray) countryObject.get("objects");
+		for(int i=0;i<objectArray.size();i++) {
+			country.add((String)((JSONObject)objectArray.get(i)).get("value"));
+		}
+		}
+		ArrayList<String> category= new ArrayList<>();
+		JSONObject categoryObject= (JSONObject)tags.get("category");
+		objectArray = (JSONArray) categoryObject.get("objects");
+		for(int i=0;i<objectArray.size();i++) {
+			category.add((String)((JSONObject)objectArray.get(i)).get("value"));
+		}
+		ArrayList<String> genre= new ArrayList<>();
+		JSONObject genreObject= (JSONObject)tags.get("genre");
+		objectArray = (JSONArray) genreObject.get("objects");
+		for(int i=0;i<objectArray.size();i++) {
+			genre.add((String)((JSONObject)objectArray.get(i)).get("value"));
+		}
+		
+        return new Program(objectType,createDate,description, endDate, externalId, id, images, rating, year, /*episode_number, season_number,series_id, series_name,*/ name, startDate, country, category, genre);
+    }
+
+
+	 public Channel parseChannelObject(JSONObject channel) 
+	    {
+	        JSONObject resultObject = (JSONObject) channel.get("result");
+	        String objectType=(String)resultObject.get("objectType");
+			long totalCount=(long) resultObject.get("totalCount");
+	         JSONArray channelsArray = (JSONArray) resultObject.get("objects");
+	         ArrayList<Program> programs= new ArrayList<>();
+	         for(int i=0;i<channelsArray.size();i++) {
+	        	 programs.add(this.parseProgramObject((JSONObject)channelsArray.get(i)));
+	         }
+	        
+	        return new Channel(objectType,totalCount,programs);
+	    }
 	
 	public ArrayList<JSONObject> getChannels(){
 		return channels;

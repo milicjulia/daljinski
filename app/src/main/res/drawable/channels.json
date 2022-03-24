@@ -69,7 +69,7 @@
                         "objectType": "KalturaMultilingualStringValue",
                         "value": "7"
                     },
-                    "series_id": {
+                    "series_id": {  
                         "objectType": "KalturaMultilingualStringValue",
                         "value": "2279499"
                     },
