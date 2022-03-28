@@ -4,7 +4,6 @@ import java.net.Socket;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import RemoteControlService;
 
 public class ServerRunnable implements Runnable {
 

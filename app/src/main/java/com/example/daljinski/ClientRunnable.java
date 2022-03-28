@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import RemoteControlService;
 
 public class ClientRunnable implements Runnable {
 
@@ -48,7 +46,7 @@ public class ClientRunnable implements Runnable {
 				new Handler(Looper.getMainLooper()).post(new Runnable() {
 					@Override
 					public void run() {
-						if (message.equals("HOME")) rcs.sendMessageToUI(RemoteControlService.CMD__HOME, null);
+						if (message.equals("HOME")) rcs.sendMessageToUI("CMD__HOME", null);
 						else if (message.equals("VOLDOOWN")) rcs.sendMessageToUI("VOLDOWN", null);
 						else if (message.equals("VOLUP")) rcs.sendMessageToUI("VOLUP", null);
 						else if (message.equals("CHDOOWN")) rcs.sendMessageToUI("CHDOWN", null);

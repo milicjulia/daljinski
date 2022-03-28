@@ -1,6 +1,7 @@
 package com.example.daljinski;
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,12 +17,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import androidx.appcompat.app.AlertDialog;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 
-public class MeniFragment extends Fragment implements RecognitionListener{
+public class MeniFragment extends Fragment implements RecognitionListener, STBCommunicationTask.STBTaskListenner
+{
     private Button chUp, chDown, volUp, volDown, S;
 
     public static int getVolume() {
@@ -121,30 +124,39 @@ public class MeniFragment extends Fragment implements RecognitionListener{
         if(channel!=1)
             channel-=1;
         txt2.setText(String.valueOf(channel));
-		MainActivity.sendMessageToSTB("CHDOWN");
+        sendMessageToSTB("CHDOWN");
     }
 
     public void channelUp(){
         channel+=1;
         txt2.setText(String.valueOf(channel));
-		MainActivity.sendMessageToSTB("CHUP");
+		sendMessageToSTB("CHUP");
     }
 
     public void volumeDown(){
         if(volume<=100 && volume>=5)
             volume-=5;
         txt1.setText(String.valueOf(volume));
-		MainActivity.sendMessageToSTB("VOLDOWN");
+        sendMessageToSTB("VOLDOWN");
     }
 
     public void volumeUp(){
         if(volume<=95 && volume>=0)
             volume+=5;
         txt1.setText(String.valueOf(volume));
-		MainActivity.sendMessageToSTB("VOLUP");
+        sendMessageToSTB("VOLUP");
     }
-	
-	
+
+    public void sendMessageToSTB(String msg) {
+        if (MainActivity.getServiceConnection().isBound()) {
+            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
+        }
+    }
+    public void sendMessageToSTB(String msg, String extra) {
+        if (MainActivity.getServiceConnection().isBound()) {
+            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg, extra);
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -206,15 +218,15 @@ public class MeniFragment extends Fragment implements RecognitionListener{
 
     @Override
     public void onResults(Bundle results) {
+        boolean c=false, v=false, up=false, d=false;
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        if(matches.contains(new String("channel"))){
-            if(matches.contains(new String("up"))) channelUp();
-            else if (matches.contains(new String("down"))) channelDown();
-        }
-        else  if(matches.contains(new String("volume"))){
-            if(matches.contains(new String("up"))) volumeUp();
-            else if (matches.contains(new String("down"))) volumeDown();
-        }
+
+            if(matches.get(0).compareToIgnoreCase("channel up")==0) channelUp();
+            else if (matches.get(0).compareToIgnoreCase("channel down")==0) channelDown();
+            else  if(matches.get(0).compareToIgnoreCase("volume up")==0) volumeUp();
+            else if (matches.get(0).compareToIgnoreCase("volume down")==0) volumeDown();
+
+
         String text = "";
         for (String result : matches)
             text += result + "\n";
@@ -288,8 +300,15 @@ public class MeniFragment extends Fragment implements RecognitionListener{
         super.onStop();
         Log.d("mess","stop");
     }
-	
-	
-	
 
+
+    @Override
+    public void requestSucceed(String request, String message, String command) {
+
+    }
+
+    @Override
+    public void requestFailed(String request, String message, String command) {
+
+    }
 }

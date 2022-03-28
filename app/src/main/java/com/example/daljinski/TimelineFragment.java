@@ -6,36 +6,86 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableContainer;
 import android.media.Image;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class TimelineFragment extends Fragment {
     private ImageView channelPicture;
     View view;
+    ViewGroup vg=(ViewGroup) view;
+    private static int id=0;
+    int mojid=id++;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         view= inflater.inflate(R.layout.fragment_timeline, container, false);
-        Log.d("mess","uslo");
-        return view;
+        ImageView iv=new ImageView(this.getContext());
+        Drawable drawable = LoadImageFromWebOperations(MainActivity.getChannels().get(mojid).getPrograms().get(0).getImages().get(0));
+        iv.setImageDrawable(drawable);
+        iv.setLayoutParams(new FrameLayout.LayoutParams(
+                90,FrameLayout.LayoutParams.MATCH_PARENT,
+                Gravity.CENTER));
+        vg.addView(iv);
+        LinearLayout sv=new LinearLayout(this.getContext());
+        sv=view.findViewById(R.id.skrol);
+        int brprograma=MainActivity.getChannels().get(mojid).getPrograms().size();
+        for(int i=0;i<brprograma;i++){
+            FrameLayout f=new FrameLayout(this.getContext());
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(170,
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    Gravity.CENTER);
+            f.setClickable(true);
+            f.setLayoutParams(params);
 
+           sv.addView(f);
+        }
+        vg.addView(sv);
+        return vg;
+
+    }
+
+    private Drawable LoadImageFromWebOperations(String url)
+    {
+        try{
+            InputStream is = (InputStream) new URL(url).getContent();
+            Drawable d = Drawable.createFromStream(is, "src name");
+            return d;
+        }catch (Exception e) {
+            System.out.println("Exc="+e);
+            return null;
+        }
     }
 
 

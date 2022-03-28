@@ -10,12 +10,12 @@
         android:id="@+id/timeline">
 
         <!-- the circular icon on the left -->
-        <ImageView
+       <!-- <ImageView
             android:id="@+id/channel_picture"
             android:background="@drawable/rts"
             android:layout_width="90dp"
             android:layout_height="match_parent"
-            />
+            />-->
 
     <HorizontalScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -24,6 +24,7 @@
         android:fillViewport="true">
 
         <LinearLayout
+            android:id="@+id/skrol"
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="horizontal"
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -31,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <!-- the blue line -->
-        <FrameLayout
+        <!--<FrameLayout
             android:id="@+id/linija"
             android:layout_width="15dp"
             android:layout_height="match_parent"
@@ -39,7 +40,6 @@
             >
         </FrameLayout>
 
-        <!-- views at the right of the blue line -->
         <FrameLayout
             android:id="@+id/kanal"
             android:layout_width="170dp"
@@ -66,7 +66,7 @@
             android:orientation="horizontal"
             android:clickable="true">
             <include layout="@layout/fragment_program" />
-        </FrameLayout>
+        </FrameLayout>-->
 </LinearLayout>
     </HorizontalScrollView>
     </LinearLayout>

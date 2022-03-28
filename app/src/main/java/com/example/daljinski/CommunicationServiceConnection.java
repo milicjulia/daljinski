@@ -2,7 +2,6 @@ package com.example.daljinski;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import CommunicationBinder;
 
 public class CommunicationServiceConnection implements ServiceConnection {
 
@@ -35,7 +34,7 @@ public class CommunicationServiceConnection implements ServiceConnection {
 	
 	@Override
 	public void onServiceConnected(ComponentName className, IBinder service) {
-		CommunicationBinder binder = (CommunicationBinder) service;
+		CommunicationService.CommunicationBinder binder = (CommunicationService.CommunicationBinder) service;
 		stbDriver = binder.getSTBDriver();
 		bound = true;
 		if (listenner != null) {

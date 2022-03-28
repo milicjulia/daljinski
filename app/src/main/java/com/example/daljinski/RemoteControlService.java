@@ -1,5 +1,4 @@
 package com.example.daljinski;
-import java.util.ArrayList;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,49 +6,37 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
-import MainActivity;
-import ServerRunnable;
 
 public class RemoteControlService extends Service {
 	
 	public static final String TAG = "RemoteControlService" ;
-	
-	
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mMessenger.getBinder();
-    }
-    
-   /* class IncomingHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-            case MSG__REGISTER_CLIENT:
-                mClients.add(msg.replyTo);
+
+
+    public void sendMessageToUI(String msg_type, String msg_value) {
+        int type=0;
+        switch (msg_type) {
+            case "CMD__HOME": type=0;
                 break;
-            case MSG__UNREGISTER_CLIENT:
-                mClients.remove(msg.replyTo);
+            case "VOLDOWN": type=1;
                 break;
-            default:
-                super.handleMessage(msg);
-            }
+            case "VOLUP": type=2;
+                break;
+            case "CHDOWN": type=3;
+                break;
+            case "CHUP": type=4;
+                break;
+            case "GOTOALL": type=5;
+                break;
         }
-    }*/
-    
-    public void sendMessageToUI(int msg_type, String msg_value) {
-    	for (int i=mClients.size()-1; i>=0; i--) {
-            try {
-                Bundle b = new Bundle();
-                b.putString("msg_value", ""+msg_value);
-                Message msg = Message.obtain(null, msg_type);
-                msg.setData(b);
-            } catch (RemoteException e) {
-            }
-        }
+
+        Bundle b = new Bundle();
+        b.putString("msg_value", ""+type);
+        Message msg = Message.obtain(null, type);
+        msg.setData(b);
+
+
     }
 
     @Override
@@ -72,5 +59,10 @@ public class RemoteControlService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "Service Stopped.");
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }

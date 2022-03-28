@@ -18,7 +18,7 @@ public class STBRemoteControlCommunication {
 	
 	Messenger mService = null;
     boolean mIsBound;
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
+    //final Messenger mMessenger = new Messenger(new RemoteControlService.IncomingHandler());
 	
 	private MainActivity act;
 	
