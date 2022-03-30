@@ -18,21 +18,21 @@
             />-->
 
     <HorizontalScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:id="@+id/skrol"
+        tools:ignore="SpeakableTextPresentCheck">
 
-        <LinearLayout
-            android:id="@+id/skrol"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="horizontal"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/kanalisvitimeline"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <!-- the blue line -->
-        <!--<FrameLayout
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <!-- the blue line -->
+            <!--<FrameLayout
             android:id="@+id/linija"
             android:layout_width="15dp"
             android:layout_height="match_parent"
@@ -67,7 +67,7 @@
             android:clickable="true">
             <include layout="@layout/fragment_program" />
         </FrameLayout>-->
-</LinearLayout>
+        </LinearLayout>
     </HorizontalScrollView>
     </LinearLayout>
 

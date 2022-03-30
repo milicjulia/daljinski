@@ -1,7 +1,9 @@
 package com.example.daljinski;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,14 +25,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.squareup.picasso.Picasso;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -43,47 +49,77 @@ import java.util.ArrayList;
 public class TimelineFragment extends Fragment {
     private ImageView channelPicture;
     View view;
-    ViewGroup vg=(ViewGroup) view;
-    private static int id=0;
-    int mojid=id++;
+    private LinearLayout sv, timeline;
+    private HorizontalScrollView skrol;
+    private static int id = 0;
+    int mojid = id++;
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        view= inflater.inflate(R.layout.fragment_timeline, container, false);
-        ImageView iv=new ImageView(this.getContext());
-        Drawable drawable = LoadImageFromWebOperations(MainActivity.getChannels().get(mojid).getPrograms().get(0).getImages().get(0));
-        iv.setImageDrawable(drawable);
-        iv.setLayoutParams(new FrameLayout.LayoutParams(
-                90,FrameLayout.LayoutParams.MATCH_PARENT,
-                Gravity.CENTER));
-        vg.addView(iv);
-        LinearLayout sv=new LinearLayout(this.getContext());
-        sv=view.findViewById(R.id.skrol);
-        int brprograma=MainActivity.getChannels().get(mojid).getPrograms().size();
-        for(int i=0;i<brprograma;i++){
-            FrameLayout f=new FrameLayout(this.getContext());
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(170,
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    Gravity.CENTER);
-            f.setClickable(true);
-            f.setLayoutParams(params);
-
-           sv.addView(f);
-        }
-        vg.addView(sv);
-        return vg;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_timeline, container, false);
+        skrol=(HorizontalScrollView) view.findViewById(R.id.skrol);
+        sv=(LinearLayout) view.findViewById(R.id.kanalisvitimeline);
+        timeline=(LinearLayout) view.findViewById(R.id.timeline);
+        dodajSliku();
+        dodajPrograme();
+        Picasso.get().setLoggingEnabled(true);
+        return view;
 
     }
 
-    private Drawable LoadImageFromWebOperations(String url)
-    {
-        try{
+    public void dodajSliku() {
+        int dosad=0;
+        int brkanala=1;//MainActivity.getChannels().size();
+        for(int j=0;j<brkanala;j++){
+            int brprograma=MainActivity.getChannels().get(j).getPrograms().size();
+            for(int k=0;k<brprograma;k++){
+                if(mojid==dosad){
+                    ImageView iv = new ImageView(this.getContext());
+                    String url=MainActivity.getChannels().get(j).getPrograms().get(k).getImages().get(0);
+                    url.replace("http:", "https:");
+                    Picasso.get().load(url).into(iv);
+                    iv.setId(dosad);
+                    iv.setLayoutParams(new FrameLayout.LayoutParams(90, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+                    timeline.addView(iv);
+                }
+                dosad+=1;
+            }
+
+        }
+
+
+    }
+
+    public void dodajPrograme() {
+        int dosad=0;
+        int brkanala=MainActivity.getChannels().size();
+        for(int j=0;j<brkanala;j++){
+            int brprograma=MainActivity.getChannels().get(j).getPrograms().size();
+            for(int k=0;k<brprograma;k++){
+                FrameLayout f = new FrameLayout(this.getContext());
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(300,FrameLayout.LayoutParams.MATCH_PARENT , Gravity.CENTER);
+                f.setClickable(true);
+                f.setLayoutParams(params);
+                f.setId(R.id.timelinefragment+dosad);
+                sv.addView(f);
+                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                ft.replace(R.id.timelinefragment+dosad, new ProgramFragment());
+                ft.commit();
+                dosad++;
+            }
+
+        }
+
+    }
+
+    private Drawable LoadImageFromWebOperations(String url) {
+        try {
             InputStream is = (InputStream) new URL(url).getContent();
             Drawable d = Drawable.createFromStream(is, "src name");
             return d;
-        }catch (Exception e) {
-            System.out.println("Exc="+e);
+        } catch (Exception e) {
+            System.out.println("Exc=" + e);
             return null;
         }
     }

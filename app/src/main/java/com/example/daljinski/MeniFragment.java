@@ -158,6 +158,10 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
         }
     }
 
+    public static void setOmiljen(int k, int p){
+        Log.d("Omiljen","Omiljen program "+p+" na kanalu "+k);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

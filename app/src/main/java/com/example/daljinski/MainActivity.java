@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -137,8 +138,8 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 		
 	}
 	 	//TREBA BLUETOOTH UMESTO WIFI
-	public static String getLocalIpAddress() {
-		/*WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+	public String getLocalIpAddress() {
+		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		String ipBinary = null;
 		try {
 			ipBinary = Integer.toBinaryString(wm.getConnectionInfo().getIpAddress());
@@ -155,8 +156,7 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 			return actualIpAddress;
 		} else {
 			return null;
-		}*/
-		return null;
+		}
 	}
 
 	public void lauchScan() {
@@ -198,19 +198,7 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 			  e.printStackTrace();
 		  }
 
-		/*String jsonString;
-		try {
-			InputStream is = context.getAssets().open(path);
-			int size = is.available();
-			byte[] buffer = new byte[size];
-			is.read(buffer);
-			is.close();
-			jsonString = new String(buffer, "UTF-8");
-			Gson gson = new Gson();
-		} catch (IOException e) {
-			e.printStackTrace();
 
-		}*/
 
 	}
 
