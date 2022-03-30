@@ -3,9 +3,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -21,6 +23,15 @@ import android.widget.TextView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class MeniFragment extends Fragment implements RecognitionListener, STBCommunicationTask.STBTaskListenner
@@ -159,8 +170,28 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
     }
 
     public static void setOmiljen(int k, int p){
-        Log.d("Omiljen","Omiljen program "+p+" na kanalu "+k);
+            Program program=MainActivity.getChannels().get(k).getPrograms().get(p);
+            if(MainActivity.getLikes().size()==0){
+                for(int i=0;i<program.getGenres().size();i++) MainActivity.getLikes().add(program.getGenres().get(i));
+            }
+            else{
+                for(int i=0;i<program.getGenres().size();i++){
+                    boolean found=false;
+                    for (String element : MainActivity.getLikes()){
+                        if (element.compareToIgnoreCase(program.getGenres().get(i))==0){
+                            found=true;
+                            break;
+                        }
+                        if(found==false){
+                            MainActivity.getLikes().add(program.getGenres().get(i));
+                            break;
+                        }
+                    }
+                }
+            }
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

@@ -52,11 +52,12 @@ public class TimelineFragment extends Fragment {
     private LinearLayout sv, timeline;
     private HorizontalScrollView skrol;
     private static int id = 0;
-    int mojid = id++;
+    int mojid = id;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        id++;
         view = inflater.inflate(R.layout.fragment_timeline, container, false);
         skrol=(HorizontalScrollView) view.findViewById(R.id.skrol);
         sv=(LinearLayout) view.findViewById(R.id.kanalisvitimeline);
@@ -69,47 +70,33 @@ public class TimelineFragment extends Fragment {
     }
 
     public void dodajSliku() {
-        int dosad=0;
-        int brkanala=1;//MainActivity.getChannels().size();
-        for(int j=0;j<brkanala;j++){
-            int brprograma=MainActivity.getChannels().get(j).getPrograms().size();
-            for(int k=0;k<brprograma;k++){
-                if(mojid==dosad){
-                    ImageView iv = new ImageView(this.getContext());
-                    String url=MainActivity.getChannels().get(j).getPrograms().get(k).getImages().get(0);
-                    url.replace("http:", "https:");
-                    Picasso.get().load(url).into(iv);
-                    iv.setId(dosad);
-                    iv.setLayoutParams(new FrameLayout.LayoutParams(90, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.CENTER));
-                    timeline.addView(iv);
-                }
-                dosad+=1;
-            }
-
+        ImageView iv = new ImageView(this.getContext());
+        iv.setLayoutParams(new FrameLayout.LayoutParams(90, FrameLayout.LayoutParams.MATCH_PARENT, Gravity.CENTER));
+        try {
+            InputStream istr = getContext().getAssets().open(mojid==0?"rts.jpg":"disney.jpg");
+            iv.setImageDrawable(Drawable.createFromStream(istr, null));
+            sv.addView(iv);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
 
     }
 
     public void dodajPrograme() {
-        int dosad=0;
-        int brkanala=MainActivity.getChannels().size();
-        for(int j=0;j<brkanala;j++){
-            int brprograma=MainActivity.getChannels().get(j).getPrograms().size();
+        int brprograma=MainActivity.getChannels().get(mojid).getPrograms().size();
             for(int k=0;k<brprograma;k++){
                 FrameLayout f = new FrameLayout(this.getContext());
                 FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(300,FrameLayout.LayoutParams.MATCH_PARENT , Gravity.CENTER);
                 f.setClickable(true);
                 f.setLayoutParams(params);
-                f.setId(R.id.timelinefragment+dosad);
+                f.setId(R.id.timelinefragment+mojid*brprograma+k);
                 sv.addView(f);
                 FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-                ft.replace(R.id.timelinefragment+dosad, new ProgramFragment());
+                ft.replace(R.id.timelinefragment+mojid*brprograma+k, new ProgramFragment());
                 ft.commit();
-                dosad++;
             }
 
-        }
+
 
     }
 

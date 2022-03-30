@@ -12,18 +12,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 
 public class MainActivity extends Activity implements STBCommunicationTask.STBTaskListenner, CommunicationServiceConnection.ComServiceListenner {
@@ -31,13 +31,17 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
     private List<TimelineFragment> timelines=new ArrayList<TimelineFragment>();
 	public final static int COMMUNICATION_PORT = 2000;
 	STBRemoteControlCommunication stbrcc;
+	private static ArrayList<Channel> channels = new ArrayList<>();
+	private static ArrayList<String> likes = new ArrayList<String>();
+	private static CommunicationServiceConnection serviceConnection;
+	private boolean connected;
 
 	public static void setChannels(ArrayList<Channel> channels) {
 		MainActivity.channels = channels;
 	}
-
-	private static ArrayList<Channel> channels = new ArrayList<>();
-	private JSONObject user;
+	public static ArrayList<String> getLikes() {
+		return likes;
+	}
 
 	public static CommunicationServiceConnection getServiceConnection() {
 		return serviceConnection;
@@ -47,8 +51,6 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 		MainActivity.serviceConnection = serviceConnection;
 	}
 
-	private static CommunicationServiceConnection serviceConnection;
-	private boolean connected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,8 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 		stbrcc = new STBRemoteControlCommunication(this);
 	    //stbrcc.doBindService();
 		
-		ucitajJSON("C:\\Users\\juliam\\Documents\\GitHub\\daljinski\\app\\src\\assets\\channels.json",this.getApplicationContext());
+		ucitajJSONKanale(getApplicationContext());
+		ucitajJSONOmiljeni(getApplicationContext());
 
         meni1=(Button) findViewById(R.id.meni1);
         meni2=(Button) findViewById(R.id.meni2);
@@ -100,7 +103,19 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 @Override
     public void onStop() {
         super.onStop();
-        Log.d("mess","stop");
+	JSONArray list = new JSONArray();
+	for(String s:likes){
+		list.add(s);
+	}
+	JSONParser jsonParser = new JSONParser();
+	AssetManager manager = getApplicationContext().getAssets();
+
+	try (FileWriter file = new FileWriter("C:\\Users\\juliam\\Documents\\GitHub\\daljinski\\app\\src\\main\\assets\\user.json")) {
+		file.write(list.toJSONString());
+		Log.d("stop", String.valueOf(list.size()));
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
 		if (serviceConnection.isBound()) {
     		unbindService(serviceConnection);
     		serviceConnection.setBound(false);
@@ -177,7 +192,7 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 		connected = false;
 	}
 	
-	public void ucitajJSON(String path, Context context) {
+	public void ucitajJSONKanale(Context context) {
       	JSONParser jsonParser = new JSONParser();
 		AssetManager manager = context.getAssets();
 
@@ -198,7 +213,27 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 			  e.printStackTrace();
 		  }
 
+	}
 
+	public void ucitajJSONOmiljeni(Context context) {
+		JSONParser jsonParser = new JSONParser();
+		AssetManager manager = context.getAssets();
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(manager.open("user.json"), "UTF-8")))
+		{
+			Object obj = jsonParser.parse(reader);
+			JSONArray likes = (JSONArray) obj;
+
+			for(int i=0;i<likes.size();i++) {
+				MainActivity.getLikes().add((String)likes.get(i));
+			}
+
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -279,8 +314,6 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 		return channels;
 	}
 	
-	public JSONObject getUser(){
-		return user;
-	}
+
 
 }

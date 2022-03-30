@@ -29,7 +29,7 @@ public class ProgramFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_program, container, false);
         sv=(LinearLayout) view.findViewById(R.id.programlayout);
-
+       // if(id==95) id=0;
         int dosad=0;
         int brkanala=MainActivity.getChannels().size();
         for(int j=0;j<brkanala;j++){
@@ -84,7 +84,7 @@ public class ProgramFragment extends Fragment {
         gledaj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MeniFragment.setChannel(k);
+                MeniFragment.setChannel(k+1);
             }
         });
         ly.addView(gledaj);
@@ -97,7 +97,9 @@ public class ProgramFragment extends Fragment {
         o.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 MeniFragment.setOmiljen(k,p);
+
             }
         });
         ly.addView(o);
