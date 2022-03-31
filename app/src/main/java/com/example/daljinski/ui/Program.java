@@ -1,19 +1,20 @@
-package com.example.daljinski;
+package com.example.daljinski.ui;
 
 import java.util.ArrayList;
 
 public class Program {
-	String objectType;
-	long createDate;
-	String description;
-	long endDate;
-	String externalId;
-	long id;
-	ArrayList<String> images= new ArrayList<>();
-	long rating;
-	long year;
-	String name;
-	long startDate;
+	private String objectType;
+	private long createDate;
+	private String description;
+	private long endDate;
+	private String externalId;
+	private long id;
+	private String image;
+	private long rating;
+	private long year;
+	private String name;
+	private long startDate;
+	private int idKanala;
 
 	public String getObjectType() {
 		return objectType;
@@ -63,12 +64,20 @@ public class Program {
 		this.id = id;
 	}
 
-	public ArrayList<String> getImages() {
-		return images;
+	public int getIdKanala() {
+		return idKanala;
 	}
 
-	public void setImages(ArrayList<String> images) {
-		this.images = images;
+	public void setIdKanala(int id) {
+		this.idKanala = id;
+	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
 	}
 
 	public long getRating() {
@@ -131,14 +140,14 @@ public class Program {
 	ArrayList<String> category= new ArrayList<>();
 	ArrayList<String> genres= new ArrayList<>();
 	
-	public Program(String objectType, long createDate, String description, long endDate, String externalId, long id, ArrayList<String> images, long rating, long year, /*long episode_number, long season_number, long series_id, String series_name,*/ String name, long startDate, ArrayList<String> country, ArrayList<String> category, ArrayList<String> genres) {
+	public Program(String objectType, long createDate, String description, long endDate, String externalId, long id,String image, long rating, long year, /*long episode_number, long season_number, long series_id, String series_name,*/ String name, long startDate, ArrayList<String> country, ArrayList<String> category, ArrayList<String> genres) {
 		this.objectType=objectType;
 		this.createDate=createDate;
 		this.description=description;
 		this.endDate=endDate;
 		this.externalId=externalId;
 		this.id=id;
-		this.images=images;
+		this.image=image;
 		this.rating=rating;
 		this.year=year;
 		/*this.episode_number=episode_number;

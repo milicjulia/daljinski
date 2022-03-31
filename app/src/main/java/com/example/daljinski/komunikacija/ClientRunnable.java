@@ -1,4 +1,4 @@
-package com.example.daljinski;
+package com.example.daljinski.komunikacija;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

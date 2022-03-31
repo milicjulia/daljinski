@@ -1,4 +1,4 @@
-package com.example.daljinski;
+package com.example.daljinski.ui;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+
+import com.example.daljinski.MainActivity;
+import com.example.daljinski.R;
 
 import java.util.ArrayList;
 
@@ -47,6 +50,33 @@ public class ChannelFragment extends Fragment {
 
 
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("ChannelFragment","start");
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("ChannelFragment","resume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("ChannelFragment","pause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("ChannelFragment","stop");
+        TimelineFragment.setId(0);
+        ProgramFragment.setId(0);
     }
 
 

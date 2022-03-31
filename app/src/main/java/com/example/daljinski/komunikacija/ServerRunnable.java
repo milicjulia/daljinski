@@ -1,8 +1,7 @@
-package com.example.daljinski;
+package com.example.daljinski.komunikacija;
 import java.net.ServerSocket;
 import java.net.Socket;
-import android.os.Handler;
-import android.os.Looper;
+
 import android.util.Log;
 
 public class ServerRunnable implements Runnable {

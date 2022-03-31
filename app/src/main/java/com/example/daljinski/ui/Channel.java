@@ -1,4 +1,4 @@
-package com.example.daljinski;
+package com.example.daljinski.ui;
 
 import java.util.ArrayList;
 

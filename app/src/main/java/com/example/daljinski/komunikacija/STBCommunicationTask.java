@@ -1,4 +1,4 @@
-package com.example.daljinski;
+package com.example.daljinski.komunikacija;
 import android.os.AsyncTask;
 import android.util.Log;
 

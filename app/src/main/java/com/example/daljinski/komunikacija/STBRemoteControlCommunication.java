@@ -1,4 +1,4 @@
-package com.example.daljinski;
+package com.example.daljinski.komunikacija;
 import android.app.Instrumentation;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.KeyEvent;
+
+import com.example.daljinski.MainActivity;
 
 public class STBRemoteControlCommunication {
 	

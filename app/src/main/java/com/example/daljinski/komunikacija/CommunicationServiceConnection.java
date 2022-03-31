@@ -1,4 +1,4 @@
-package com.example.daljinski;
+package com.example.daljinski.komunikacija;
 import android.content.ComponentName;
 import android.content.ServiceConnection;
 import android.os.IBinder;

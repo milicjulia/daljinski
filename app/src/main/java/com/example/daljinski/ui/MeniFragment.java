@@ -1,13 +1,11 @@
-package com.example.daljinski;
+package com.example.daljinski.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -23,15 +21,11 @@ import android.widget.TextView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.example.daljinski.MainActivity;
+import com.example.daljinski.R;
+import com.example.daljinski.komunikacija.STBCommunication;
+import com.example.daljinski.komunikacija.STBCommunicationTask;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class MeniFragment extends Fragment implements RecognitionListener, STBCommunicationTask.STBTaskListenner
@@ -65,7 +59,7 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         view= inflater.inflate(R.layout.fragment_meni, container, false);
-		
+		Log.d("oncreateview","uslo");
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_INTERNET);
         }
@@ -314,26 +308,29 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("mess","start");
+        Log.d("MeniFragment","start");
         txt2.setText(String.valueOf(channel));
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("mess","resume");
+        Log.d("MeniFragment","resume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("mess","pause");
+        Log.d("MeniFragment","pause");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.d("mess","stop");
+        Log.d("MeniFragment","stop");
+        TimelineFragment.setId(0);
+        ProgramFragment.setId(0);
     }
 
 

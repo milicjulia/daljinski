@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_channel.xml" value="0.1" />
+        <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_meni.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_program.xml" value="0.18072916666666666" />
+        <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_recommended.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_timeline.xml" value="0.18072916666666666" />
       </map>
     </option>

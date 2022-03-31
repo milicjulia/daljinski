@@ -1,12 +1,12 @@
-package com.example.daljinski;
+package com.example.daljinski.komunikacija;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.Messenger;
 import android.util.Log;
+
+import com.example.daljinski.MainActivity;
 
 public class RemoteControlService extends Service {
 	

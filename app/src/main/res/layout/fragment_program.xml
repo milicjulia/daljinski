@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:clickable="true"
     android:orientation="vertical"
-    tools:context=".ProgramFragment"
+    tools:context=".ui.ProgramFragment"
     tools:ignore="SpeakableTextPresentCheck">
 
     <!-- TODO: Update blank fragment layout -->
