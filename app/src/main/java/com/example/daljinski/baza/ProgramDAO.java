@@ -17,6 +17,9 @@ public interface ProgramDAO {
     @Query("SELECT ProgramEntity.url FROM ProgramEntity WHERE id = :idp ")
     Maybe<String> getImageForProgram(long idp);
 
+    @Query("SELECT ProgramEntity.id FROM ProgramEntity WHERE id = :idp ")
+    int getIdProgram(long idp);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertProgram(ProgramEntity program);
 

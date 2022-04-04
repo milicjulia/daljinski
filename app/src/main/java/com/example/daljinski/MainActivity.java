@@ -22,6 +22,10 @@ import com.example.daljinski.baza.OmiljeniDAO;
 import com.example.daljinski.baza.OmiljeniEntity;
 import com.example.daljinski.baza.ProgramDAO;
 import com.example.daljinski.baza.ProgramEntity;
+import com.example.daljinski.baza.ZanrDAO;
+import com.example.daljinski.baza.ZanrProgramDAO;
+import com.example.daljinski.baza.ZanrProgramEntity;
+import com.example.daljinski.baza.ZanroviEntity;
 import com.example.daljinski.komunikacija.CommunicationServiceConnection;
 import com.example.daljinski.komunikacija.STBCommunication;
 import com.example.daljinski.komunikacija.STBCommunicationTask;
@@ -60,6 +64,8 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
     private ChannelDAO channelDao;
     private ProgramDAO programDao;
     private OmiljeniDAO omiljeniDAO;
+    private ZanrDAO zanroviDAO;
+    private ZanrProgramDAO zpDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,18 +104,24 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
         editor.commit();*/
         ucitajJSONKanale(getApplicationContext());
         ucitajJSONOmiljeni(getApplicationContext());
+        channelDao = db.channelDao();
+        programDao = db.programDao();
+        omiljeniDAO = db.omiljeniDAO();
+        zanroviDAO = db.zanrDAO();
+        zpDAO = db.zanrProgramDAO();
         for (int i=0;i<channels.size();i++) {
-            channelDao = db.channelDao();
             channelDao.insertChannel(new ChannelEntity(i+1, channels.get(i).getObjectType(), channels.get(i).getTotalCount()));
             for(int j=0;j<channels.get(i).getPrograms().size();j++){
                 channels.get(i).getPrograms().get(j).setIdKanala(i+1);
-                programDao = db.programDao();
                 Program p=channels.get(i).getPrograms().get(j);
                 programDao.insertProgram(new ProgramEntity(p));
+                for(String s:p.getGenres()){
+                    zanroviDAO.insertZanr(new ZanroviEntity(s));
+                    zpDAO.insertZanrProgram(new ZanrProgramEntity(programDao.getIdProgram(p.getId()),s));
+                }
             }
         }
         for (String like: likes) {
-            omiljeniDAO = db.omiljeniDAO();
             omiljeniDAO.insertOmiljen(new OmiljeniEntity(like));
         }
 

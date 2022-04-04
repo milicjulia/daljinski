@@ -22,8 +22,8 @@ public interface ChannelDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertChannel(ChannelEntity channel);
 
-    @Query("SELECT * FROM ChannelEntity " + "JOIN ProgramEntity ON ChannelEntity.brojKanala = ProgramEntity.idKanala")
-    public Map<ChannelEntity, List<ProgramEntity>> getProgramsForChannels();
+    @Query("SELECT * FROM ChannelEntity JOIN ProgramEntity ON ChannelEntity.brojKanala = ProgramEntity.idKanala")
+    Map<ChannelEntity, List<ProgramEntity>> getProgramsForChannels();
 
     @Query("DELETE FROM ChannelEntity")
     void deleteAllChannels();
