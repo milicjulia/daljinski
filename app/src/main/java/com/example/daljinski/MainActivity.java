@@ -10,6 +10,7 @@ import android.content.res.AssetManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.View;
+import android.view.translation.Translator;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -30,13 +31,14 @@ import com.example.daljinski.komunikacija.CommunicationServiceConnection;
 import com.example.daljinski.komunikacija.STBCommunication;
 import com.example.daljinski.komunikacija.STBCommunicationTask;
 import com.example.daljinski.komunikacija.STBRemoteControlCommunication;
-import com.example.daljinski.ui.Channel;
+import com.example.daljinski.entiteti.Channel;
 import com.example.daljinski.ui.ChannelFragment;
 import com.example.daljinski.ui.MeniFragment;
-import com.example.daljinski.ui.Program;
+import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.ui.RecommendedFragment;
 import com.example.daljinski.ui.TimelineFragment;
 
+import org.intellij.lang.annotations.Language;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
@@ -54,7 +56,7 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
     public final static int COMMUNICATION_PORT = 2000;
     STBRemoteControlCommunication stbrcc;
     private static ArrayList<Channel> channels = new ArrayList<>();
-    private static ArrayList<String> likes = new ArrayList<String>();
+    private static ArrayList<OmiljeniEntity> likes = new ArrayList<>();
     private static CommunicationServiceConnection serviceConnection;
     private boolean connected;
     private static String KEY_FIRST_RUN = "";
@@ -103,7 +105,6 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
         editor.putString("KEY_FIRST_RUN", KEY_FIRST_RUN);
         editor.commit();*/
         ucitajJSONKanale(getApplicationContext());
-        ucitajJSONOmiljeni(getApplicationContext());
         channelDao = db.channelDao();
         programDao = db.programDao();
         omiljeniDAO = db.omiljeniDAO();
@@ -121,8 +122,8 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
                 }
             }
         }
-        for (String like: likes) {
-            omiljeniDAO.insertOmiljen(new OmiljeniEntity(like));
+        for (OmiljeniEntity like: omiljeniDAO.getOmiljene()) {
+            likes.add(like);
         }
 
         meni1 = (Button) findViewById(R.id.meni1);
@@ -158,7 +159,7 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
         MainActivity.channels = channels;
     }
 
-    public static ArrayList<String> getLikes() {
+    public static ArrayList<OmiljeniEntity> getLikes() {
         return likes;
     }
 
@@ -181,8 +182,8 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
     @Override
     public void onStop() {
         super.onStop();
-        for(String like:likes){
-            omiljeniDAO.insertOmiljen(new OmiljeniEntity(like));
+        for(OmiljeniEntity like:likes){
+            omiljeniDAO.insertOmiljen(like);
         }
 
         if (serviceConnection.isBound()) {
@@ -286,26 +287,6 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 
     }
 
-    public void ucitajJSONOmiljeni(Context context) {
-        JSONParser jsonParser = new JSONParser();
-        AssetManager manager = context.getAssets();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(manager.open("user.json"), "UTF-8"))) {
-            Object obj = jsonParser.parse(reader);
-            JSONArray likes = (JSONArray) obj;
-
-            for (int i = 0; i < likes.size(); i++) {
-                MainActivity.getLikes().add((String) likes.get(i));
-            }
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-
-    }
 
 
     public Program parseProgramObject(JSONObject program) {

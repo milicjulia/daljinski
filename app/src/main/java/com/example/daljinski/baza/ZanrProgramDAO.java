@@ -19,6 +19,9 @@ public interface ZanrProgramDAO {
     @Query("SELECT * FROM ZanrProgramEntity WHERE idPrograma = :idc ")
     List<ZanrProgramEntity> getGenresForProgram(int idc);
 
+    @Query("SELECT * FROM ZanrProgramEntity WHERE zanr = :z ")
+    List<ZanrProgramEntity> getProgramsForGenre(String z);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertZanrProgram(ZanrProgramEntity zp);
 

@@ -23,6 +23,8 @@ import androidx.core.content.ContextCompat;
 
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
+import com.example.daljinski.baza.OmiljeniEntity;
+import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.komunikacija.STBCommunication;
 import com.example.daljinski.komunikacija.STBCommunicationTask;
 
@@ -166,18 +168,18 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
     public static void setOmiljen(int k, int p){
             Program program=MainActivity.getChannels().get(k).getPrograms().get(p);
             if(MainActivity.getLikes().size()==0){
-                for(int i=0;i<program.getGenres().size();i++) MainActivity.getLikes().add(program.getGenres().get(i));
+                for(int i=0;i<program.getGenres().size();i++) MainActivity.getLikes().add(new OmiljeniEntity(program.getGenres().get(i)));
             }
             else{
                 for(int i=0;i<program.getGenres().size();i++){
                     boolean found=false;
-                    for (String element : MainActivity.getLikes()){
-                        if (element.compareToIgnoreCase(program.getGenres().get(i))==0){
+                    for (OmiljeniEntity element : MainActivity.getLikes()){
+                        if (element.getTip().compareToIgnoreCase(program.getGenres().get(i))==0){
                             found=true;
                             break;
                         }
                         if(found==false){
-                            MainActivity.getLikes().add(program.getGenres().get(i));
+                            MainActivity.getLikes().add(new OmiljeniEntity(program.getGenres().get(i)));
                             break;
                         }
                     }

@@ -40,6 +40,8 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.core:core:1.7.0'
     implementation files('C:\\Users\\juliam\\Documents\\GitHub\\daljinski\\app\\libs\\json-simple-1.1.jar')
+    implementation 'com.google.mlkit:translate:17.0.0'
+
     implementation ('com.squareup.picasso:picasso:2.71828') {
         exclude group: 'com.android.support'
         exclude module: ['exifinterface', 'support-annotations']

@@ -3,7 +3,7 @@ package com.example.daljinski.baza;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.example.daljinski.ui.Program;
+import com.example.daljinski.entiteti.Program;
 
 @Entity
 public class ProgramEntity {
