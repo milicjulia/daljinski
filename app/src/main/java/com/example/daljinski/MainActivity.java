@@ -10,7 +10,6 @@ import android.content.res.AssetManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.View;
-import android.view.translation.Translator;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -37,6 +36,7 @@ import com.example.daljinski.ui.MeniFragment;
 import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.ui.RecommendedFragment;
 import com.example.daljinski.ui.TimelineFragment;
+import com.example.daljinski.entiteti.Translator;
 
 import org.intellij.lang.annotations.Language;
 import org.json.simple.JSONArray;
@@ -68,6 +68,8 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
     private OmiljeniDAO omiljeniDAO;
     private ZanrDAO zanroviDAO;
     private ZanrProgramDAO zpDAO;
+private String fromLang = "ru";
+    private String toLang = "bs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -295,7 +297,7 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
         try {
             objectType = (String) program.get("objectType");
             long createDate = (long) program.get("createDate");
-            String description = (String) program.get("description");
+            String description = Translator.translate(fromLang, toLang,(String) program.get("description"));
             long endDate = (long) program.get("endDate");
             String externalId = (String) program.get("externalId");
             long id = (long) program.get("id");
@@ -307,7 +309,7 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
             long year;
             if ((JSONObject) metas.get("year") == null) year = 0;
             else year = Integer.parseInt((String) ((JSONObject) metas.get("year")).get("value"));
-            String name = (String) program.get("name");
+            String name = Translator.translate(fromLang, toLang,(String) program.get("name"));
             long startDate = (long) program.get("startDate");
             JSONObject tags = (JSONObject) program.get("tags");
             ArrayList<String> country = new ArrayList<>();
@@ -316,20 +318,20 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
             if (countryObject != null) {
                 objectArray = (JSONArray) countryObject.get("objects");
                 for (int i = 0; i < objectArray.size(); i++) {
-                    country.add((String) ((JSONObject) objectArray.get(i)).get("value"));
+                    country.add(Translator.translate(fromLang, toLang,(String) ((JSONObject) objectArray.get(i)).get("value")));
                 }
             }
             ArrayList<String> category = new ArrayList<>();
             JSONObject categoryObject = (JSONObject) tags.get("category");
             objectArray = (JSONArray) categoryObject.get("objects");
             for (int i = 0; i < objectArray.size(); i++) {
-                category.add((String) ((JSONObject) objectArray.get(i)).get("value"));
+                category.add(Translator.translate(fromLang, toLang,(String) ((JSONObject) objectArray.get(i)).get("value")));
             }
             ArrayList<String> genre = new ArrayList<>();
             JSONObject genreObject = (JSONObject) tags.get("genre");
             objectArray = (JSONArray) genreObject.get("objects");
             for (int i = 0; i < objectArray.size(); i++) {
-                genre.add((String) ((JSONObject) objectArray.get(i)).get("value"));
+                genre.add(Translator.translate(fromLang, toLang,(String) ((JSONObject) objectArray.get(i)).get("value")));
             }
             return new Program(objectType, createDate, description, endDate, externalId, id, image, rating, year, /*episode_number, season_number,series_id, series_name,*/ name, startDate, country, category, genre);
 
@@ -344,7 +346,7 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
         JSONObject resultObject = null;
         try {
             resultObject = (JSONObject) channel.get("result");
-            String objectType = (String) resultObject.get("objectType");
+            String objectType = Translator.translate(fromLang, toLang,(String) resultObject.get("objectType"));
             long totalCount = (long) resultObject.get("totalCount");
             JSONArray channelsArray = (JSONArray) resultObject.get("objects");
             ArrayList<Program> programs = new ArrayList<>();
