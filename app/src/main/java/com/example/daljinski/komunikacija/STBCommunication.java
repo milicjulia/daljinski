@@ -1,4 +1,20 @@
+/**
+ * Copyright (C) 2012 Sylvain Bilange, Fabien Fleurey <fabien@fleurey.com>
+ *
+ * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 3, 29 June 2007;
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.daljinski.komunikacija;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,14 +22,9 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+
 import android.util.Log;
 
-/*
- * IMPORTANT :
- * This class performs network operations (communication through sockets)
- * It means long time operations, causing trouble (java exception) if they are executed in the main thread (UI)
- * That's why it has to be called from a Thread, Runnable, AsyncTask (and not from UI, or service without thread)
- */
 
 public class STBCommunication {
 	

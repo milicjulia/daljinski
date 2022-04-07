@@ -7,7 +7,7 @@ import com.example.daljinski.entiteti.Program;
 
 @Entity
 public class ProgramEntity {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     private long id;
     private String objectType;
     private long createDate;
@@ -22,6 +22,7 @@ public class ProgramEntity {
     private int idKanala;
 
     public ProgramEntity(Program p) {
+        this.id=p.getId();
         this.objectType = p.getObjectType();
         this.createDate = p.getCreateDate();
         this.description = p.getDescription();

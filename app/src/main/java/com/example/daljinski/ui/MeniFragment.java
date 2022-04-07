@@ -24,13 +24,13 @@ import androidx.core.content.ContextCompat;
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
 import com.example.daljinski.baza.OmiljeniEntity;
+import com.example.daljinski.entiteti.Channel;
 import com.example.daljinski.entiteti.Program;
-import com.example.daljinski.komunikacija.STBCommunication;
-import com.example.daljinski.komunikacija.STBCommunicationTask;
+import com.example.daljinski.entiteti.Translator;
 
 import java.util.ArrayList;
 
-public class MeniFragment extends Fragment implements RecognitionListener, STBCommunicationTask.STBTaskListenner
+public class MeniFragment extends Fragment implements RecognitionListener
 {
     private Button chUp, chDown, volUp, volDown, S;
 
@@ -131,39 +131,26 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
         if(channel!=1)
             channel-=1;
         txt2.setText(String.valueOf(channel));
-        sendMessageToSTB("CHDOWN");
     }
 
     public void channelUp(){
         channel+=1;
         txt2.setText(String.valueOf(channel));
-		sendMessageToSTB("CHUP");
     }
 
     public void volumeDown(){
         if(volume<=100 && volume>=5)
             volume-=5;
         txt1.setText(String.valueOf(volume));
-        sendMessageToSTB("VOLDOWN");
     }
 
     public void volumeUp(){
         if(volume<=95 && volume>=0)
             volume+=5;
         txt1.setText(String.valueOf(volume));
-        sendMessageToSTB("VOLUP");
     }
 
-    public void sendMessageToSTB(String msg) {
-        if (MainActivity.getServiceConnection().isBound()) {
-            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
-        }
-    }
-    public void sendMessageToSTB(String msg, String extra) {
-        if (MainActivity.getServiceConnection().isBound()) {
-            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg, extra);
-        }
-    }
+
 
     public static void setOmiljen(int k, int p){
             Program program=MainActivity.getChannels().get(k).getPrograms().get(p);
@@ -184,6 +171,7 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
                         }
                     }
                 }
+
             }
     }
 
@@ -256,6 +244,36 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
             else if (matches.get(0).compareToIgnoreCase("channel down")==0) channelDown();
             else  if(matches.get(0).compareToIgnoreCase("volume up")==0) volumeUp();
             else if (matches.get(0).compareToIgnoreCase("volume down")==0) volumeDown();
+            else{
+                try {
+                    String akcija= Translator.translate(matches.get(0));
+                    boolean found=false;
+                    Program pretraga=null;
+                    for(Channel ch:MainActivity.getChannels()){
+                        for(Program p:ch.getPrograms()){
+                            if(p.getName().contains(akcija)){
+                                pretraga=p;
+                                break;
+                            }
+                            else if(p.getGenres().contains(akcija)){
+                                pretraga=p;
+                                break;
+                            }
+                            else if(p.getDescription().contains(akcija)){
+                                pretraga=p;
+                                break;
+                            }
+                        }
+                        if(pretraga!=null) break;
+                    }
+                    if(pretraga!=null) {
+                        MeniFragment.setChannel(pretraga.getIdKanala());
+                        //Log.d("prikazuje ", pretraga.getName());Log.d("prikazuje ", pretraga.getDescription());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
 
         String text = "";
@@ -336,13 +354,4 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
     }
 
 
-    @Override
-    public void requestSucceed(String request, String message, String command) {
-
-    }
-
-    @Override
-    public void requestFailed(String request, String message, String command) {
-
-    }
 }

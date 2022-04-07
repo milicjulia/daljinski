@@ -150,10 +150,6 @@ public class Program {
 		this.image=image;
 		this.rating=rating;
 		this.year=year;
-		/*this.episode_number=episode_number;
-		this.season_number=season_number;
-		this.series_id=series_id;
-		this.series_name=series_name;*/
 		this.name=name;
 		this.startDate=startDate;
 		this.country=country;

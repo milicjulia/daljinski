@@ -7,28 +7,5 @@
     android:layout_height="match_parent"
     tools:context=".ui.ChannelFragment"
     android:orientation="vertical">
-<!--
-    <FrameLayout
-        android:id="@+id/svikanali"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        >
-        <include layout="@layout/fragment_timeline" />
-    </FrameLayout>
-
-    <FrameLayout
-        android:id="@+id/svikanali1"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        >
-        <include layout="@layout/fragment_timeline" />
-    </FrameLayout>
-    <FrameLayout
-        android:id="@+id/svikanali2"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        >
-        <include layout="@layout/fragment_timeline" />
-    </FrameLayout>-->
 
 </LinearLayout>

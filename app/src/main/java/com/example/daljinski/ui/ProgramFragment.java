@@ -13,8 +13,6 @@ import android.widget.TextView;
 
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
-import com.example.daljinski.komunikacija.STBCommunication;
-import com.example.daljinski.komunikacija.STBCommunicationTask;
 
 import java.sql.Timestamp;
 
@@ -114,15 +112,4 @@ public class ProgramFragment extends Fragment {
         ly.addView(o);
     }
 
-    public void sendMessageToSTB(String msg) {
-        if (MainActivity.getServiceConnection().isBound()) {
-            new STBCommunicationTask((STBCommunicationTask.STBTaskListenner) this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
-        }
-    }
-
-    public void sendMessageToSTB(String msg, String extra) {
-        if (MainActivity.getServiceConnection().isBound()) {
-            new STBCommunicationTask((STBCommunicationTask.STBTaskListenner) this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg, extra);
-        }
-    }
 }

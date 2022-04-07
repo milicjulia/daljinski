@@ -1,3 +1,5 @@
+package com.example.daljinski.entiteti;
+
 import java.io.BufferedReader;
 import java.io.OutputStream;
 import java.io.InputStreamReader;
@@ -9,23 +11,11 @@ public class Translator {
   private static final String CLIENT_ID = "FREE_TRIAL_ACCOUNT";
   private static final String CLIENT_SECRET = "PUBLIC_SECRET";
   private static final String ENDPOINT = "http://api.whatsmate.net/v1/translation/translate";
+  private static String fromLang = "en";
+  private static String toLang = "ru";
 
-  /**
-   * Entry Point
-   */
-  public static void main(String[] args) throws Exception {
-    // TODO: Specify your translation requirements here:
-    String fromLang = "en";
-    String toLang = "bs";
-    String text = "Hey how are you";
 
-    Translator.translate(fromLang, toLang, text);
-  }
-
-  /**
-   * Sends out a WhatsApp message via WhatsMate WA Gateway.
-   */
-  public static String translate(String fromLang, String toLang, String text) throws Exception {
+  public static String translate(String text) throws Exception {
     // TODO: Should have used a 3rd party library to make a JSON string from an object
     String jsonPayload = new StringBuilder()
       .append("{")
@@ -55,16 +45,17 @@ public class Translator {
     os.close();
 
     int statusCode = conn.getResponseCode();
-    System.out.println("Status Code: " + statusCode);
+    //System.out.println("Status Code: " + statusCode);
     BufferedReader br = new BufferedReader(new InputStreamReader(
         (statusCode == 200) ? conn.getInputStream() : conn.getErrorStream()
       ));
-    String output;
-    while ((output = br.readLine()) != null) {
+    String output="";
+    /*while ((output = br.readLine()) != null) {
         System.out.println(output);
-    }
+    }*/
+    output=br.readLine();
     conn.disconnect();
-	return output;
+    return output;
   }
 
 }

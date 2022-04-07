@@ -20,6 +20,12 @@
             android:textSize="15dp"/>
 
         <TextView
+            android:id="@+id/kanal1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13dp"/>
+
+        <TextView
             android:id="@+id/vreme1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -54,6 +60,12 @@
             android:textSize="15dp"/>
 
         <TextView
+            android:id="@+id/kanal2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13dp"/>
+
+        <TextView
             android:id="@+id/vreme2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -86,6 +98,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15dp"/>
+
+        <TextView
+            android:id="@+id/kanal3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13dp"/>
 
         <TextView
             android:id="@+id/vreme3"

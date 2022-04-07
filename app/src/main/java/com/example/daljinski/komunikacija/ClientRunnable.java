@@ -1,13 +1,29 @@
+/**
+ * Copyright (C) 2012 Sylvain Bilange, Fabien Fleurey <fabien@fleurey.com>
+ *
+ * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 3, 29 June 2007;
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.gnu.org/licenses/lgpl-3.0.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.daljinski.komunikacija;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-
 public class ClientRunnable implements Runnable {
 
 	private static final String TAG = ClientRunnable.class.getSimpleName();
@@ -39,30 +55,36 @@ public class ClientRunnable implements Runnable {
 				userTextTmp = null;
 				if ("Hello".equals(messageTmp)) {
 					sendMessage("World");
-				}
+				} else if ("CLIENT_DISCONNECT".equals(messageTmp)) {
+					Log.i(TAG, "action for client " + socket.hashCode() + ": disconnected");
+					break;
+
+				} else if (userTextInput) {
+					userTextTmp = messageTmp;
+					userTextInput = false;
+				} 
 				final String userText = userTextTmp;
 				final String message = messageTmp;
 				// Send the key command to activities that listen to the service
 				new Handler(Looper.getMainLooper()).post(new Runnable() {
 					@Override
 					public void run() {
-						if (message.equals("HOME")) rcs.sendMessageToUI("CMD__HOME", null);
-						else if (message.equals("VOLDOOWN")) rcs.sendMessageToUI("VOLDOWN", null);
-						else if (message.equals("VOLUP")) rcs.sendMessageToUI("VOLUP", null);
-						else if (message.equals("CHDOOWN")) rcs.sendMessageToUI("CHDOWN", null);
-						else if (message.equals("CHLUP")) rcs.sendMessageToUI("CHUP", null);
-						else if (message.equals("GOTOALL")) rcs.sendMessageToUI("GOTOALL", null);
-					}
+						if (message.equals(Commands.SELECT)) rcs.sendMessageToUI(RemoteControlService.CMD__SELECT, null);
+						else if (message.equals(Commands.MOVE_UP)) rcs.sendMessageToUI(RemoteControlService.CMD__MOVE_UP, null);
+						else if (message.equals(Commands.MOVE_DOWN)) rcs.sendMessageToUI(RemoteControlService.CMD__MOVE_DOWN, null);
+						else if (message.equals(Commands.SOUND_PLUS)) rcs.sendMessageToUI(RemoteControlService.CMD__SOUND_PLUS, null);
+						else if (message.equals(Commands.SOUND_MINUS)) rcs.sendMessageToUI(RemoteControlService.CMD__SOUND_MINUS, null);
+						}
 				});
 				// update UI
-				/*new Handler(Looper.getMainLooper()).post(new Runnable() {
+				new Handler(Looper.getMainLooper()).post(new Runnable() {
 					@Override
 					public void run() {
 						if (!"Test".equals(message)) {
 							rcs.sendMessageToUI(RemoteControlService.MSG__PRINT_NEW_CLIENT_ACTION, message);
 						}
 					}
-				});*/
+				});
 				// send feedback
 				sendMessage(message + "__ok");
 			}
