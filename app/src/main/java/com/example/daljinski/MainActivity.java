@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
 import com.example.daljinski.baza.BazaDatabase;
@@ -55,7 +56,7 @@ import java.util.List;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class MainActivity extends Activity implements STBCommunicationTask.STBTaskListenner, CommunicationServiceConnection.ComServiceListenner {
+public class MainActivity extends AppCompatActivity implements STBCommunicationTask.STBTaskListenner, CommunicationServiceConnection.ComServiceListenner {
     private Button meni1, meni2, meni3;
     private List<TimelineFragment> timelines = new ArrayList<>();
     public final static int COMMUNICATION_PORT = 2000;
@@ -183,7 +184,7 @@ public class MainActivity extends Activity implements STBCommunicationTask.STBTa
 
     //TREBA BLUETOOTH UMESTO WIFI
     public String getLocalIpAddress() {
-        WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager wm = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         String ipBinary = null;
         try {
             ipBinary = Integer.toBinaryString(wm.getConnectionInfo().getIpAddress());

@@ -117,65 +117,60 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
             @Override
             public void onClick(View view) {
                 channelDown();
-                sendMessageToSTB(Commands.MOVE_DOWN);
             }
         });
         chUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 channelUp();
-                sendMessageToSTB(Commands.MOVE_UP);
             }
         });
         volDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 volumeDown();
-                sendMessageToSTB(Commands.SOUND_MINUS);
             }
         });
         volUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 volumeUp();
-                sendMessageToSTB(Commands.SOUND_PLUS);
             }
         });
     }
 
     private void sendMessageToSTB(String msg) {
     if (MainActivity.getServiceConnection().isBound()) {
+        Log.d("senMessToSTB",msg);
         new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
     }
 }
-
-    private void sendMessageToSTB(String msg, String extra) {
-        if (MainActivity.getServiceConnection().isBound()) {
-            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg, extra);
-        }
-    }
 
     public void channelDown(){
         if(channel!=1)
             channel-=1;
         txt2.setText(String.valueOf(channel));
+        sendMessageToSTB(Commands.MOVE_DOWN);
     }
 
     public void channelUp(){
         channel+=1;
         txt2.setText(String.valueOf(channel));
+        sendMessageToSTB(Commands.MOVE_UP);
     }
 
     public void volumeDown(){
         if(volume<=100 && volume>=5)
             volume-=5;
         txt1.setText(String.valueOf(volume));
+        sendMessageToSTB(Commands.SOUND_MINUS);
     }
 
     public void volumeUp(){
         if(volume<=95 && volume>=0)
             volume+=5;
         txt1.setText(String.valueOf(volume));
+        sendMessageToSTB(Commands.SOUND_PLUS);
     }
 
 

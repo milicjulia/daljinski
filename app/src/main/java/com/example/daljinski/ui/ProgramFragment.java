@@ -1,25 +1,34 @@
 package com.example.daljinski.ui;
 
 import android.app.Fragment;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableContainer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 
 public class ProgramFragment extends Fragment {
     private TextView vreme, naziv;
     private LinearLayout sv, ly;
-    private Button gledaj, o;
+    private ImageButton gledaj, o;
+    private Bitmap heart, circle;
 
 
     public static void setId(int id) {
@@ -35,7 +44,6 @@ public class ProgramFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_program, container, false);
         sv = (LinearLayout) view.findViewById(R.id.programlayout);
-        // if(id==95) id=0;
         int dosad = 0;
         int brkanala = MainActivity.getChannels().size();
         for (int j = 0; j < brkanala; j++) {
@@ -55,6 +63,16 @@ public class ProgramFragment extends Fragment {
                 dosad += 1;
             }
 
+        }
+
+        InputStream is1 = null,is2 = null;
+        try {
+            is1= this.getResources().getAssets().open("heart.jpg");
+            heart = BitmapFactory.decodeStream(is1);
+            is2 = this.getResources().getAssets().open("heart.jpg");
+            circle = BitmapFactory.decodeStream(is2);
+        } catch (IOException e) {
+            Log.w("EL", e);
         }
 
 
@@ -83,10 +101,10 @@ public class ProgramFragment extends Fragment {
     }
 
     public void dodajDugmeGledaj(int k, int p) {
-        gledaj = (Button) new Button(this.getContext());
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+        gledaj = (ImageButton) new ImageButton(this.getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
         gledaj.setLayoutParams(params);
-        gledaj.setText("o");
+        gledaj.setImageBitmap(circle);
         gledaj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,10 +115,10 @@ public class ProgramFragment extends Fragment {
     }
 
     public void dodajDugmeOmiljen(int k, int p) {
-        o = (Button) new Button(this.getContext());
+        o = (ImageButton) new ImageButton(this.getContext());
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
         o.setLayoutParams(params);
-        o.setText("<3");
+        o.setImageBitmap(heart);
         o.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

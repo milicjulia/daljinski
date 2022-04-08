@@ -38,8 +38,8 @@ public class ChannelFragment extends Fragment {
     public void dodajKanale() {
         int brkonala = MainActivity.getChannels().size();
         for (int i = 0; i < brkonala; i++) {
-            FrameLayout f = new FrameLayout(this.getContext());
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 300, Gravity.CENTER);
+            FrameLayout f = new FrameLayout(getContext());
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 250, Gravity.CENTER);
             f.setLayoutParams(params);
             f.setId(R.id.channelfragment+i);
             frames.add(f);
