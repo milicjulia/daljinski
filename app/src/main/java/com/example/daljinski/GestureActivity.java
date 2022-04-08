@@ -20,16 +20,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ImageView;
+
+import com.example.daljinski.gestures.GestureHandler;
+import com.example.daljinski.gestures.GestureManager;
+import com.example.daljinski.komunikacija.Commands;
 import com.example.daljinski.komunikacija.CommunicationService;
 import com.example.daljinski.komunikacija.CommunicationServiceConnection;
-import com.example.daljinski.komunikacija.GestureManager;
 import com.example.daljinski.komunikacija.STBCommunication;
 import com.example.daljinski.komunikacija.STBCommunicationTask;
 
-public class GestureActivity extends Activity implements STBCommunicationTask.STBTaskListenner {
+public class GestureActivity extends Activity implements GestureHandler, STBCommunicationTask.STBTaskListenner {
 
 	private static final String TAG = GestureActivity.class.getSimpleName();
 	private static final int DISPLAY_TIME = 1000;
@@ -39,13 +43,15 @@ public class GestureActivity extends Activity implements STBCommunicationTask.ST
 	
 	private GestureManager gestureManager;
 	private GestureDetector gestureDetector;
-	private ImageView image;
+	//private ImageView image;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		gestureManager = new GestureManager(this);
+		gestureDetector = new GestureDetector(getApplicationContext(), gestureManager);
 	}
+
 
 	@Override
     protected void onStart() {
@@ -68,29 +74,50 @@ public class GestureActivity extends Activity implements STBCommunicationTask.ST
 	}
 
 
+	@Override
+	public boolean slidingUp() {
+		Log.d(TAG, "Gesture detected: Up");
+		sendMessageToSTB(Commands.MOVE_UP);
+		return true;
+	}
+
+	@Override
+	public boolean slidingDown() {
+		Log.d(TAG, "Gesture detected: Down");
+		sendMessageToSTB(Commands.MOVE_DOWN);
+		return true;
+	}
+
+	@Override
+	public boolean singleTap() {
+		Log.d(TAG, "Gesture detected: SingleTap");
+		sendMessageToSTB(Commands.SELECT);
+		return true;
+	}
 
 
-	
 	private void sendMessageToSTB(String msg) {
 		if (serviceConnection.isBound()) {
-			new STBCommunicationTask((STBCommunicationTask.STBTaskListenner) this, serviceConnection.getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
+			new STBCommunicationTask(this, serviceConnection.getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
 		}
 	}
 
 	private Runnable cancelDisplay = new Runnable() {
 		@Override
-		public void run() {
-
-		}
+		public void run() { }
 	};
+
 
 	@Override
 	public void requestSucceed(String request, String message, String command) {
-
+		handler.removeCallbacks(cancelDisplay);
+		handler.postDelayed(cancelDisplay, DISPLAY_TIME);
 	}
+
+
 
 	@Override
 	public void requestFailed(String request, String message, String command) {
-
+		// TODO Auto-generated method stub
 	}
 }

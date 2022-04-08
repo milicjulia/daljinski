@@ -27,10 +27,13 @@ import com.example.daljinski.baza.OmiljeniEntity;
 import com.example.daljinski.entiteti.Channel;
 import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.entiteti.Translator;
+import com.example.daljinski.komunikacija.Commands;
+import com.example.daljinski.komunikacija.STBCommunication;
+import com.example.daljinski.komunikacija.STBCommunicationTask;
 
 import java.util.ArrayList;
 
-public class MeniFragment extends Fragment implements RecognitionListener
+public class MeniFragment extends Fragment implements RecognitionListener, STBCommunicationTask.STBTaskListenner
 {
     private Button chUp, chDown, volUp, volDown, S;
 
@@ -61,7 +64,14 @@ public class MeniFragment extends Fragment implements RecognitionListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         view= inflater.inflate(R.layout.fragment_meni, container, false);
-		Log.d("oncreateview","uslo");
+
+        dodajZaSpeech();
+        dodajKomponente();
+
+        return view;
+    }
+
+    public void dodajZaSpeech(){
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_INTERNET);
         }
@@ -72,6 +82,9 @@ public class MeniFragment extends Fragment implements RecognitionListener
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
 
+    }
+
+    public void dodajKomponente(){
         chUp=(Button) view.findViewById(R.id.chup);
         chDown=(Button) view.findViewById(R.id.chdown);
         volUp=(Button) view.findViewById(R.id.volup);
@@ -104,27 +117,42 @@ public class MeniFragment extends Fragment implements RecognitionListener
             @Override
             public void onClick(View view) {
                 channelDown();
+                sendMessageToSTB(Commands.MOVE_DOWN);
             }
         });
         chUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 channelUp();
+                sendMessageToSTB(Commands.MOVE_UP);
             }
         });
         volDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 volumeDown();
+                sendMessageToSTB(Commands.SOUND_MINUS);
             }
         });
         volUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 volumeUp();
+                sendMessageToSTB(Commands.SOUND_PLUS);
             }
         });
-        return view;
+    }
+
+    private void sendMessageToSTB(String msg) {
+    if (MainActivity.getServiceConnection().isBound()) {
+        new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
+    }
+}
+
+    private void sendMessageToSTB(String msg, String extra) {
+        if (MainActivity.getServiceConnection().isBound()) {
+            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg, extra);
+        }
     }
 
     public void channelDown(){
@@ -171,11 +199,8 @@ public class MeniFragment extends Fragment implements RecognitionListener
                         }
                     }
                 }
-
             }
     }
-
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -354,4 +379,17 @@ public class MeniFragment extends Fragment implements RecognitionListener
     }
 
 
+    @Override
+    public void requestSucceed(String request, String message, String command) {
+        if (STBCommunication.REQUEST_SCAN.equals(request)) {
+            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_CONNECT, message);
+        } else if (STBCommunication.REQUEST_CONNECT.equals(request)) {
+            MainActivity.setConnected(true);
+        }
+    }
+
+    @Override
+    public void requestFailed(String request, String message, String command) {
+        MainActivity.setConnected(false);
+    }
 }

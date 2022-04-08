@@ -34,15 +34,19 @@ import com.example.daljinski.baza.ZanroviEntity;
 import com.example.daljinski.entiteti.Channel;
 import com.example.daljinski.komunikacija.CommunicationService;
 import com.example.daljinski.komunikacija.CommunicationServiceConnection;
+import com.example.daljinski.komunikacija.STBCommunication;
+import com.example.daljinski.komunikacija.STBCommunicationTask;
 import com.example.daljinski.ui.ChannelFragment;
 import com.example.daljinski.ui.MeniFragment;
 import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.ui.RecommendedFragment;
 import com.example.daljinski.ui.TimelineFragment;
 
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.*;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -51,47 +55,41 @@ import java.util.List;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements STBCommunicationTask.STBTaskListenner, CommunicationServiceConnection.ComServiceListenner {
     private Button meni1, meni2, meni3;
-    private List<TimelineFragment> timelines = new ArrayList<TimelineFragment>();
+    private List<TimelineFragment> timelines = new ArrayList<>();
     public final static int COMMUNICATION_PORT = 2000;
     private static ArrayList<Channel> channels = new ArrayList<>();
     private static ArrayList<OmiljeniEntity> likes = new ArrayList<>();
-    private boolean connected;
-    private static String KEY_FIRST_RUN = "";
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
     public BazaDatabase db;
     private ChannelDAO channelDao;
     private ProgramDAO programDao;
     private OmiljeniDAO omiljeniDAO;
     private ZanrDAO zanroviDAO;
     private ZanrProgramDAO zanrProgramDAO;
-    private CommunicationServiceConnection serviceConnection;
+    private static CommunicationServiceConnection serviceConnection;
+    private static boolean connected;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        serviceConnection = new CommunicationServiceConnection() {
-
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                // TODO Auto-generated method stub
-
-            }
-        };
-        db = Room.databaseBuilder(getApplicationContext(), BazaDatabase.class, "database-name").allowMainThreadQueries().build();
         setContentView(R.layout.activity_main);
+
+        serviceConnection = new CommunicationServiceConnection(this);
+
+        db = Room.databaseBuilder(getApplicationContext(), BazaDatabase.class, "database-name").allowMainThreadQueries().build();
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
         ucitajJSONKanale(getApplicationContext());
+        poveziSaDAO();
+        dodajKomponenteMeni();
+
+    }
+
+    public void poveziSaDAO(){
         channelDao = db.channelDao();
         programDao = db.programDao();
         omiljeniDAO = db.omiljeniDAO();
@@ -113,7 +111,9 @@ public class MainActivity extends Activity {
         for (OmiljeniEntity like: omiljeniDAO.getOmiljene()) {
             likes.add(like);
         }
+    }
 
+    public void dodajKomponenteMeni(){
         meni1 = (Button) findViewById(R.id.meni1);
         meni2 = (Button) findViewById(R.id.meni2);
         meni3 = (Button) findViewById(R.id.meni3);
@@ -138,17 +138,22 @@ public class MainActivity extends Activity {
             }
 
         });
-
-    }
-
-    public static void setChannels(ArrayList<Channel> channels) {
-        MainActivity.channels = channels;
     }
 
     public static ArrayList<OmiljeniEntity> getLikes() {
         return likes;
     }
-
+    public static ArrayList<Channel> getChannels() {
+        return channels;
+    }
+    public static CommunicationServiceConnection getServiceConnection() { return serviceConnection; }
+    public static void setServiceConnection(CommunicationServiceConnection serviceConnection) {
+        MainActivity.serviceConnection = serviceConnection;
+    }
+    public static boolean isConnected() { return connected; }
+    public static void setConnected(boolean connected) {
+        MainActivity.connected = connected;
+    }
 
     private void loadFragment(Fragment fragment) {
         FragmentManager fm = getFragmentManager();
@@ -176,8 +181,6 @@ public class MainActivity extends Activity {
 
     }
 
-
-
     //TREBA BLUETOOTH UMESTO WIFI
     public String getLocalIpAddress() {
         WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -201,9 +204,6 @@ public class MainActivity extends Activity {
         }
     }
 
-
-
-
     public void ucitajJSONKanale(Context context) {
         JSONParser jsonParser = new JSONParser();
         AssetManager manager = context.getAssets();
@@ -224,8 +224,6 @@ public class MainActivity extends Activity {
         }
 
     }
-
-
 
     public Program parseProgramObject(JSONObject program) {
         String objectType = null;
@@ -296,9 +294,34 @@ public class MainActivity extends Activity {
         return null;
     }
 
-    public static ArrayList<Channel> getChannels() {
-        return channels;
+
+    @Override
+    public void requestSucceed(String request, String message, String command) {
+        if (STBCommunication.REQUEST_SCAN.equals(request)) {
+            new STBCommunicationTask(this, serviceConnection.getSTBDriver()).execute(STBCommunication.REQUEST_CONNECT, message);
+        } else if (STBCommunication.REQUEST_CONNECT.equals(request)) {
+            connected = true;
+            invalidateOptionsMenu();
+        }
     }
 
+    @Override
+    public void requestFailed(String request, String message, String command) { }
 
+
+    public void lauchScan() {
+        new STBCommunicationTask(this, serviceConnection.getSTBDriver()).execute(STBCommunication.REQUEST_SCAN, getLocalIpAddress());
+    }
+
+    @Override
+    public void serviceBound() {
+        if (!serviceConnection.getSTBDriver().isConnected()) {
+            lauchScan();
+        }
+    }
+
+    @Override
+    public void serviceUnbind() {
+        connected = false;
+    }
 }
