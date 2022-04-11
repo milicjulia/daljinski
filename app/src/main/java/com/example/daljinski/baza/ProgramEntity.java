@@ -10,13 +10,9 @@ public class ProgramEntity {
     @PrimaryKey
     private long id;
     private String objectType;
-    private long createDate;
     private String description;
     private long endDate;
     private String externalId;
-    private String url;
-    private long rating;
-    private long year;
     private String name;
     private long startDate;
     private int idKanala;
@@ -24,13 +20,9 @@ public class ProgramEntity {
     public ProgramEntity(Program p) {
         this.id=p.getId();
         this.objectType = p.getObjectType();
-        this.createDate = p.getCreateDate();
         this.description = p.getDescription();
         this.endDate = p.getEndDate();
         this.externalId = p.getExternalId();
-        this.url = p.getImage();
-        this.rating = p.getRating();
-        this.year = p.getYear();
         this.name = p.getName();
         this.startDate = p.getStartDate();
         this.idKanala = p.getIdKanala();
@@ -43,14 +35,6 @@ public class ProgramEntity {
 
     public void setObjectType(String objectType) {
         this.objectType = objectType;
-    }
-
-    public long getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(long createDate) {
-        this.createDate = createDate;
     }
 
     public String getDescription() {
@@ -75,26 +59,6 @@ public class ProgramEntity {
 
     public void setExternalId(String externalId) {
         this.externalId = externalId;
-    }
-
-    public String getUrl() { return url; }
-
-    public void setUrl(String url) { this.url = url; }
-
-    public long getRating() {
-        return rating;
-    }
-
-    public void setRating(long rating) {
-        this.rating = rating;
-    }
-
-    public long getYear() {
-        return year;
-    }
-
-    public void setYear(long year) {
-        this.year = year;
     }
 
     public String getName() {

@@ -4,14 +4,10 @@ import java.util.ArrayList;
 
 public class Program {
 	private String objectType;
-	private long createDate;
 	private String description;
 	private long endDate;
 	private String externalId;
 	private long id;
-	private String image;
-	private long rating;
-	private long year;
 	private String name;
 	private long startDate;
 	private int idKanala;
@@ -22,14 +18,6 @@ public class Program {
 
 	public void setObjectType(String objectType) {
 		this.objectType = objectType;
-	}
-
-	public long getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(long createDate) {
-		this.createDate = createDate;
 	}
 
 	public String getDescription() {
@@ -72,30 +60,6 @@ public class Program {
 		this.idKanala = id;
 	}
 
-	public String getImage() {
-		return image;
-	}
-
-	public void setImage(String image) {
-		this.image = image;
-	}
-
-	public long getRating() {
-		return rating;
-	}
-
-	public void setRating(long rating) {
-		this.rating = rating;
-	}
-
-	public long getYear() {
-		return year;
-	}
-
-	public void setYear(long year) {
-		this.year = year;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -112,48 +76,19 @@ public class Program {
 		this.startDate = startDate;
 	}
 
-	public ArrayList<String> getCountry() {
-		return country;
-	}
-
-	public void setCountry(ArrayList<String> country) {
-		this.country = country;
-	}
-
-	public ArrayList<String> getCategory() {
-		return category;
-	}
-
-	public void setCategory(ArrayList<String> category) {
-		this.category = category;
-	}
-
 	public ArrayList<String> getGenres() {
 		return genres;
 	}
 
-	public void setGenres(ArrayList<String> genres) {
-		this.genres = genres;
-	}
-
-	ArrayList<String> country= new ArrayList<>();
-	ArrayList<String> category= new ArrayList<>();
-	ArrayList<String> genres= new ArrayList<>();
+	ArrayList<String> genres;
 	
-	public Program(String objectType, long createDate, String description, long endDate, String externalId, long id,String image, long rating, long year, /*long episode_number, long season_number, long series_id, String series_name,*/ String name, long startDate, ArrayList<String> country, ArrayList<String> category, ArrayList<String> genres) {
+	public Program(String objectType, String description, long endDate, long id, String name, long startDate, ArrayList<String> genres) {
 		this.objectType=objectType;
-		this.createDate=createDate;
 		this.description=description;
 		this.endDate=endDate;
-		this.externalId=externalId;
 		this.id=id;
-		this.image=image;
-		this.rating=rating;
-		this.year=year;
 		this.name=name;
 		this.startDate=startDate;
-		this.country=country;
-		this.category=category;
 		this.genres=genres;
 	}
 	

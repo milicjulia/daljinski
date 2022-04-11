@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,9 +43,9 @@ public class TimelineFragment extends Fragment {
         skrol=(HorizontalScrollView) view.findViewById(R.id.skrol);
         sv=(LinearLayout) view.findViewById(R.id.kanalisvitimeline);
         timeline=(LinearLayout) view.findViewById(R.id.timeline);
+        //Log.d("contructor","timeline");
         dodajSliku();
         dodajPrograme();
-        Picasso.get().setLoggingEnabled(true);
         return view;
 
     }

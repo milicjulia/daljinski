@@ -1,4 +1,5 @@
 package com.example.daljinski.ui;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -33,17 +34,15 @@ import com.example.daljinski.komunikacija.STBCommunicationTask;
 
 import java.util.ArrayList;
 
-public class MeniFragment extends Fragment implements RecognitionListener, STBCommunicationTask.STBTaskListenner
-{
+public class MeniFragment extends Fragment implements RecognitionListener, STBCommunicationTask.STBTaskListenner {
     private Button chUp, chDown, volUp, volDown, S;
-
-    public static int getVolume() {
-        return volume;
-    }
-
-    public static void setVolume(int volume) {
-        MeniFragment.volume = volume;
-    }
+    private static int volume = 50, channel = 1;
+    private TextView txt1, txt2, returnedText;
+    private SpeechRecognizer speech = null;
+    private Intent recognizerIntent;
+    private String LOG_TAG = "VoiceRecognitionActivity";
+    private static final int REQUEST_INTERNET = 200;
+    View view;
 
     public static int getChannel() {
         return channel;
@@ -53,17 +52,9 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
         MeniFragment.channel = channel;
     }
 
-    private static int volume=50, channel=1;
-    private TextView txt1, txt2, returnedText;
-    private SpeechRecognizer speech = null;
-    private Intent recognizerIntent;
-    private String LOG_TAG = "VoiceRecognitionActivity";
-    private static final int REQUEST_INTERNET = 200;
-    View view;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        view= inflater.inflate(R.layout.fragment_meni, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_meni, container, false);
 
         dodajZaSpeech();
         dodajKomponente();
@@ -71,7 +62,7 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
         return view;
     }
 
-    public void dodajZaSpeech(){
+    public void dodajZaSpeech() {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_INTERNET);
         }
@@ -84,26 +75,26 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
 
     }
 
-    public void dodajKomponente(){
-        chUp=(Button) view.findViewById(R.id.chup);
-        chDown=(Button) view.findViewById(R.id.chdown);
-        volUp=(Button) view.findViewById(R.id.volup);
-        volDown=(Button) view.findViewById(R.id.voldown);
-        S=(Button) view.findViewById(R.id.speechButton);
-        txt1=(TextView) view.findViewById(R.id.txt1);
-        txt2=(TextView) view.findViewById(R.id.txt2);
+    public void dodajKomponente() {
+        chUp = (Button) view.findViewById(R.id.chup);
+        chDown = (Button) view.findViewById(R.id.chdown);
+        volUp = (Button) view.findViewById(R.id.volup);
+        volDown = (Button) view.findViewById(R.id.voldown);
+        S = (Button) view.findViewById(R.id.speechButton);
+        txt1 = (TextView) view.findViewById(R.id.txt1);
+        txt2 = (TextView) view.findViewById(R.id.txt2);
         returnedText = (TextView) view.findViewById(R.id.returnedText);
         txt1.setText(String.valueOf(volume));
         txt2.setText(String.valueOf(channel));
 
-        S.setOnTouchListener(new View.OnTouchListener(){
+        S.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     speech.startListening(recognizerIntent);
-                    S.setScaleX((float)1.5);
-                    S.setScaleY((float)1.5);
+                    S.setScaleX((float) 1.5);
+                    S.setScaleY((float) 1.5);
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     speech.stopListening();
                     S.setScaleX(1);
@@ -140,61 +131,60 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
     }
 
     private void sendMessageToSTB(String msg) {
-    if (MainActivity.getServiceConnection().isBound()) {
-        Log.d("senMessToSTB",msg);
-        new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
+        if (MainActivity.getServiceConnection().isBound()) {
+            Log.d("senMessToSTB", msg);
+            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
+        }
     }
-}
 
-    public void channelDown(){
-        if(channel!=1)
-            channel-=1;
+    public void channelDown() {
+        if (channel != 1)
+            channel -= 1;
         txt2.setText(String.valueOf(channel));
         sendMessageToSTB(Commands.MOVE_DOWN);
     }
 
-    public void channelUp(){
-        channel+=1;
+    public void channelUp() {
+        channel += 1;
         txt2.setText(String.valueOf(channel));
         sendMessageToSTB(Commands.MOVE_UP);
     }
 
-    public void volumeDown(){
-        if(volume<=100 && volume>=5)
-            volume-=5;
+    public void volumeDown() {
+        if (volume <= 100 && volume >= 5)
+            volume -= 5;
         txt1.setText(String.valueOf(volume));
         sendMessageToSTB(Commands.SOUND_MINUS);
     }
 
-    public void volumeUp(){
-        if(volume<=95 && volume>=0)
-            volume+=5;
+    public void volumeUp() {
+        if (volume <= 95 && volume >= 0)
+            volume += 5;
         txt1.setText(String.valueOf(volume));
         sendMessageToSTB(Commands.SOUND_PLUS);
     }
 
 
-
-    public static void setOmiljen(int k, int p){
-            Program program=MainActivity.getChannels().get(k).getPrograms().get(p);
-            if(MainActivity.getLikes().size()==0){
-                for(int i=0;i<program.getGenres().size();i++) MainActivity.getLikes().add(new OmiljeniEntity(program.getGenres().get(i)));
-            }
-            else{
-                for(int i=0;i<program.getGenres().size();i++){
-                    boolean found=false;
-                    for (OmiljeniEntity element : MainActivity.getLikes()){
-                        if (element.getTip().compareToIgnoreCase(program.getGenres().get(i))==0){
-                            found=true;
-                            break;
-                        }
-                        if(found==false){
-                            MainActivity.getLikes().add(new OmiljeniEntity(program.getGenres().get(i)));
-                            break;
-                        }
+    public static void setOmiljen(int k, int p) {
+        Program program = MainActivity.getChannels().get(k).getPrograms().get(p);
+        if (MainActivity.getLikes().size() == 0) {
+            for (int i = 0; i < program.getGenres().size(); i++)
+                MainActivity.getLikes().add(new OmiljeniEntity(program.getGenres().get(i)));
+        } else {
+            for (int i = 0; i < program.getGenres().size(); i++) {
+                boolean found = false;
+                for (OmiljeniEntity element : MainActivity.getLikes()) {
+                    if (element.getTip().compareToIgnoreCase(program.getGenres().get(i)) == 0) {
+                        found = true;
+                        break;
+                    }
+                    if (found == false) {
+                        MainActivity.getLikes().add(new OmiljeniEntity(program.getGenres().get(i)));
+                        break;
                     }
                 }
             }
+        }
     }
 
     @Override
@@ -220,17 +210,17 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
 
     @Override
     public void onBeginningOfSpeech() {
-        Log.i(LOG_TAG, "onBeginningOfSpeech");
+        //Log.i(LOG_TAG, "onBeginningOfSpeech");
     }
 
     @Override
     public void onBufferReceived(byte[] buffer) {
-        Log.i(LOG_TAG, "onBufferReceived: " + buffer);
+        //Log.i(LOG_TAG, "onBufferReceived: " + buffer);
     }
 
     @Override
     public void onEndOfSpeech() {
-        Log.i(LOG_TAG, "onEndOfSpeech");
+        //Log.i(LOG_TAG, "onEndOfSpeech");
     }
 
     @Override
@@ -242,70 +232,60 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
 
     @Override
     public void onEvent(int arg0, Bundle arg1) {
-        Log.i(LOG_TAG, "onEvent");
+        //Log.i(LOG_TAG, "onEvent");
     }
 
     @Override
     public void onPartialResults(Bundle arg0) {
-        Log.i(LOG_TAG, "onPartialResults");
+       // Log.i(LOG_TAG, "onPartialResults");
     }
 
     @Override
     public void onReadyForSpeech(Bundle arg0) {
-        Log.i(LOG_TAG, "onReadyForSpeech");
+        //Log.i(LOG_TAG, "onReadyForSpeech");
     }
 
     @Override
     public void onResults(Bundle results) {
-        boolean c=false, v=false, up=false, d=false;
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
-            if(matches.get(0).compareToIgnoreCase("channel up")==0) channelUp();
-            else if (matches.get(0).compareToIgnoreCase("channel down")==0) channelDown();
-            else  if(matches.get(0).compareToIgnoreCase("volume up")==0) volumeUp();
-            else if (matches.get(0).compareToIgnoreCase("volume down")==0) volumeDown();
-            else{
-                try {
-                    String akcija= Translator.translate(matches.get(0));
-                    boolean found=false;
-                    Program pretraga=null;
-                    for(Channel ch:MainActivity.getChannels()){
-                        for(Program p:ch.getPrograms()){
-                            if(p.getName().contains(akcija)){
-                                pretraga=p;
-                                break;
-                            }
-                            else if(p.getGenres().contains(akcija)){
-                                pretraga=p;
-                                break;
-                            }
-                            else if(p.getDescription().contains(akcija)){
-                                pretraga=p;
-                                break;
-                            }
+        if (matches.get(0).compareToIgnoreCase("channel up") == 0) channelUp();
+        else if (matches.get(0).compareToIgnoreCase("channel down") == 0) channelDown();
+        else if (matches.get(0).compareToIgnoreCase("volume up") == 0) volumeUp();
+        else if (matches.get(0).compareToIgnoreCase("volume down") == 0) volumeDown();
+        else {
+            try {
+                String akcija = Translator.translate(matches.get(0));
+                Program pretraga = null;
+                for (Channel ch : MainActivity.getChannels()) {
+                    for (Program p : ch.getPrograms()) {
+                        if (p.getName().contains(akcija)) {
+                            pretraga = p;
+                            break;
+                        } else if (p.getGenres().contains(akcija)) {
+                            pretraga = p;
+                            break;
+                        } else if (p.getDescription().contains(akcija)) {
+                            pretraga = p;
+                            break;
                         }
-                        if(pretraga!=null) break;
                     }
-                    if(pretraga!=null) {
-                        MeniFragment.setChannel(pretraga.getIdKanala());
-                        //Log.d("prikazuje ", pretraga.getName());Log.d("prikazuje ", pretraga.getDescription());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    if (pretraga != null) break;
                 }
+                if (pretraga != null) {
+                    MeniFragment.setChannel(pretraga.getIdKanala());
+                    Log.d("prikazuje ", String.valueOf(pretraga.getIdKanala()));Log.d("prikazuje ", pretraga.getName());Log.d("prikazuje ", pretraga.getDescription());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        }
 
-
-        String text = "";
-        for (String result : matches)
-            text += result + "\n";
-
-        returnedText.setText(text);
     }
 
     @Override
     public void onRmsChanged(float rmsdB) {
-        Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
+        //Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
     }
 
     public static String getErrorText(int errorCode) {
@@ -348,7 +328,7 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("MeniFragment","start");
+        Log.d("MeniFragment", "start");
         txt2.setText(String.valueOf(channel));
 
     }
@@ -356,19 +336,19 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("MeniFragment","resume");
+        Log.d("MeniFragment", "resume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("MeniFragment","pause");
+        Log.d("MeniFragment", "pause");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.d("MeniFragment","stop");
+        Log.d("MeniFragment", "stop");
         TimelineFragment.setId(0);
         ProgramFragment.setId(0);
     }

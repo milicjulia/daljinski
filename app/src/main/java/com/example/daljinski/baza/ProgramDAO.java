@@ -17,9 +17,6 @@ public interface ProgramDAO {
     @Query("SELECT * FROM ProgramEntity WHERE id=:idp")
     ProgramEntity getProgram(int idp);
 
-    @Query("SELECT ProgramEntity.url FROM ProgramEntity WHERE id = :idp ")
-    Maybe<String> getImageForProgram(long idp);
-
     @Query("SELECT ProgramEntity.id FROM ProgramEntity WHERE id = :idp ")
     int getIdProgram(long idp);
 
