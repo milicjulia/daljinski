@@ -4,25 +4,24 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public class STBCommunicationTask extends AsyncTask<String, Void, Boolean> {
-	
 	public interface STBTaskListenner {
 		public void requestSucceed(String request, String message, String command);
 		public void requestFailed(String request, String message, String command);
 	}
-	
+
 	private static final String TAG = STBCommunicationTask.class.getSimpleName();
-	
+
 	private STBTaskListenner listenner;
 	private STBCommunication stbDriver;
 	private String message;
 	private String request;
 	private String command;
-	
-    public STBCommunicationTask(STBTaskListenner listenner, STBCommunication stbDriver) {
-    	this.listenner = listenner;
-    	this.stbDriver = stbDriver;
-    }
-	
+
+	public STBCommunicationTask(STBTaskListenner listenner, STBCommunication stbDriver) {
+		this.listenner = listenner;
+		this.stbDriver = stbDriver;
+	}
+
 	@Override
 	protected Boolean doInBackground(String... params) {
 		boolean success = false;
@@ -90,7 +89,7 @@ public class STBCommunicationTask extends AsyncTask<String, Void, Boolean> {
 			return false;
 		}
 	}
-	
+
 	@Override
 	protected void onPostExecute(Boolean result) {
 		if (result) {

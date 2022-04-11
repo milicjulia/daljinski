@@ -5,10 +5,9 @@ import android.os.Binder;
 import android.os.IBinder;
 
 public class CommunicationService extends Service implements STBCommunicationTask.STBTaskListenner {
-	
-	private final IBinder communicationBinder = new CommunicationBinder(); 
+	private final IBinder communicationBinder = new CommunicationBinder();
 	private STBCommunication stbDriver = new STBCommunication();
-	
+
 	public class CommunicationBinder extends Binder {
 		public STBCommunication getSTBDriver() {
 			return stbDriver;

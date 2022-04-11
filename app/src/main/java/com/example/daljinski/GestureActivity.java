@@ -37,14 +37,14 @@ public class GestureActivity extends Activity implements GestureHandler, STBComm
 
 	private static final String TAG = GestureActivity.class.getSimpleName();
 	private static final int DISPLAY_TIME = 1000;
-	
+
 	private final CommunicationServiceConnection serviceConnection = new CommunicationServiceConnection();
 	private final Handler handler = new Handler();
-	
+
 	private GestureManager gestureManager;
 	private GestureDetector gestureDetector;
-	//private ImageView image;
-	
+	private ImageView image;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,26 +53,40 @@ public class GestureActivity extends Activity implements GestureHandler, STBComm
 	}
 
 
-	@Override
-    protected void onStart() {
-        super.onStart();
-        bindService(new Intent(getApplicationContext(), CommunicationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
-    }
 
 	@Override
-    protected void onStop(){
-    	super.onStop();
-    	if (serviceConnection.isBound()) {
-    		unbindService(serviceConnection);
-    		serviceConnection.setBound(false);
-    	}
-    }
-	
+	protected void onStart() {
+		super.onStart();
+		bindService(new Intent(getApplicationContext(), CommunicationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	protected void onStop(){
+		super.onStop();
+		if (serviceConnection.isBound()) {
+			unbindService(serviceConnection);
+			serviceConnection.setBound(false);
+		}
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		return gestureDetector.onTouchEvent(event);
 	}
 
+	@Override
+	public boolean slidingLeft() {
+		Log.d(TAG, "Gesture detected: Left");
+		sendMessageToSTB(Commands.MOVE_LEFT);
+		return true;
+	}
+
+	@Override
+	public boolean slidingRight() {
+		Log.d(TAG, "Gesture detected: Right");
+		sendMessageToSTB(Commands.MOVE_RIGHT);
+		return true;
+	}
 
 	@Override
 	public boolean slidingUp() {
@@ -95,6 +109,12 @@ public class GestureActivity extends Activity implements GestureHandler, STBComm
 		return true;
 	}
 
+	@Override
+	public boolean doubleTap() {
+		Log.d(TAG, "Gesture detected: DoubleTap");
+		sendMessageToSTB(Commands.BACK);
+		return true;
+	}
 
 	private void sendMessageToSTB(String msg) {
 		if (serviceConnection.isBound()) {
@@ -102,22 +122,26 @@ public class GestureActivity extends Activity implements GestureHandler, STBComm
 		}
 	}
 
-	private Runnable cancelDisplay = new Runnable() {
-		@Override
-		public void run() { }
-	};
-
-
 	@Override
 	public void requestSucceed(String request, String message, String command) {
-		handler.removeCallbacks(cancelDisplay);
-		handler.postDelayed(cancelDisplay, DISPLAY_TIME);
+
 	}
-
-
 
 	@Override
 	public void requestFailed(String request, String message, String command) {
 		// TODO Auto-generated method stub
 	}
+
+	private void displayCallback(int resourceId) {
+		handler.removeCallbacks(cancelDisplay);
+		image.setBackgroundResource(resourceId);
+		handler.postDelayed(cancelDisplay, DISPLAY_TIME);
+	}
+
+	private Runnable cancelDisplay = new Runnable() {
+		@Override
+		public void run() {
+			image.setBackgroundResource(0);
+		}
+	};
 }

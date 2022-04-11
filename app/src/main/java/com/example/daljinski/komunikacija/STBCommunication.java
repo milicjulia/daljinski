@@ -10,25 +10,24 @@ import java.net.SocketAddress;
 import android.util.Log;
 
 public class STBCommunication {
-	
 	private static final String TAG = STBCommunication.class.getSimpleName();
-	
+
 	public static final int COMMUNICATION_PORT = 2000;
 	public static final String REQUEST_SCAN = "scan";
 	public static final String REQUEST_CONNECT = "connect";
 	public static final String REQUEST_DISCONNECT = "disconnect";
 	public static final String REQUEST_COMMAND = "command";
 	public static final String REQUEST_UNKNOWN = "unknown";
-	
+
 	private Socket sock;
 	private PrintWriter out;
-	
+
 	public String scanSubnet(String localAddr, int port) {
 		String subnet = localAddr.substring(0, localAddr.lastIndexOf(".") + 1);
 		Socket socket = null;
 		PrintWriter out = null;
-	    BufferedReader in = null;
-	    String ipServer = null;
+		BufferedReader in = null;
+		String ipServer = null;
 		for (int d = 1 ; d < 255 ; d ++) {
 			String ip = subnet + d;
 			SocketAddress address = new InetSocketAddress(ip, port);
@@ -57,20 +56,20 @@ public class STBCommunication {
 		Log.i(TAG, "scan ip server: " + ipServer);
 		return ipServer;
 	}
-	
+
 	public boolean stbConnect(final String ip, final int port) {
-        try {
-            sock = new Socket(ip, port);
-            sock.setReuseAddress(true);
+		try {
+			sock = new Socket(ip, port);
+			sock.setReuseAddress(true);
 			out = new PrintWriter(sock.getOutputStream(), true);
-            Log.i(TAG, "Connected to the STB");
-            return true;
+			Log.i(TAG, "Connected to the STB");
+			return true;
 		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());
 			return false;
 		}
 	}
-	
+
 	public boolean stbDisconnect() {
 		if (isConnected()) {
 			out.println("CLIENT_DISCONNECT");
