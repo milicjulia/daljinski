@@ -55,7 +55,6 @@ public class ChannelFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_channel, container, false);
         layout = (LinearLayout) view.findViewById(R.id.linearlayout1);
-    //Log.d("constructor","channel");
         dodajSliku();
         dodajKanale();
         return view;
@@ -73,7 +72,6 @@ public class ChannelFragment extends Fragment {
             FragmentTransaction ft = getChildFragmentManager().beginTransaction();
             ft.replace(R.id.channelfragment+i, new TimelineFragment());
             ft.commit();
-
 
         }
     }

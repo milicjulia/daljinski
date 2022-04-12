@@ -1,16 +1,17 @@
 package com.example.daljinski.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.room.Room;
-
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
 import com.example.daljinski.baza.BazaDatabase;
@@ -18,12 +19,10 @@ import com.example.daljinski.baza.OmiljeniEntity;
 import com.example.daljinski.baza.ProgramEntity;
 import com.example.daljinski.baza.ZanrProgramEntity;
 import com.example.daljinski.entiteti.Program;
+import com.google.android.material.button.MaterialButton;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,8 +35,8 @@ public class RecommendedFragment extends Fragment {
     private ArrayList<TextView> kanal = new ArrayList<>();
     private ArrayList<TextView> opis = new ArrayList<>();
     private ArrayList<TextView> vreme = new ArrayList<>();
-    private ArrayList<Button> gledaj = new ArrayList<>();
-    private int ids[] = {R.id.naziv1, R.id.kanal1, R.id.vreme1, R.id.opis1, R.id.gledaj1, R.id.naziv2, R.id.kanal2, R.id.vreme2, R.id.opis2, R.id.gledaj2, R.id.naziv3, R.id.kanal3, R.id.vreme3, R.id.opis3, R.id.gledaj3};
+    private ArrayList<MaterialButton> gledaj = new ArrayList<>();
+    private int ids[] = {R.id.naziv1,  R.id.vreme1, R.id.opis1, R.id.gledaj1, R.id.naziv2, R.id.vreme2, R.id.opis2, R.id.gledaj2, R.id.naziv3,  R.id.vreme3, R.id.opis3, R.id.gledaj3};
     View view;
 
     @Override
@@ -50,11 +49,10 @@ public class RecommendedFragment extends Fragment {
 
     public void dodajKomponente(View v) {
         for (int i = 0; i < 3; i++) {
-            naziv.add(view.findViewById(ids[i * 5]));
-            kanal.add(view.findViewById(ids[i * 5 + 1]));
-            vreme.add(view.findViewById(ids[i * 5 + 2]));
-            opis.add(view.findViewById(ids[i * 5 + 3]));
-            gledaj.add(view.findViewById(ids[i * 5 + 4]));
+            naziv.add(view.findViewById(ids[i * 4]));
+            vreme.add(view.findViewById(ids[i * 4 + 1]));
+            opis.add(view.findViewById(ids[i * 4 + 2]));
+            gledaj.add(view.findViewById(ids[i * 4+ 3]));
         }
     }
 
@@ -63,16 +61,25 @@ public class RecommendedFragment extends Fragment {
         Timestamp time;
         for (Program p : recommend()) {
             naziv.get(i).setText(p.getName());
-            kanal.get(i).setText("Kanal " + (p.getIdKanala()));
             time = new Timestamp(p.getStartDate());
-            vreme.get(i).setText(time.getHours() + ":" + time.getMinutes());
+            vreme.get(i).setText("       "+time.getHours() + ":" + time.getMinutes());
             opis.get(i).setText(p.getDescription());
-            gledaj.get(i).setOnClickListener(new View.OnClickListener() {
+            int finalI = i;
+            gledaj.get(i).setOnTouchListener(new View.OnTouchListener() {
+                @SuppressLint("ClickableViewAccessibility")
                 @Override
-                public void onClick(View view) {
-                    MeniFragment.setChannel(p.getIdKanala());
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        gledaj.get(finalI).setTextColor(Color.CYAN);
+                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                        MeniFragment.setChannel(p.getIdKanala());
+                        gledaj.get(finalI).setTextColor(Color.rgb(30,128,115));
+                        gledaj.get(finalI).setBackgroundColor(Color.WHITE);
+                    }
+                    return true;
                 }
             });
+
             i++;
         }
     }
@@ -150,7 +157,7 @@ public class RecommendedFragment extends Fragment {
             Program pomi = list.get(i);
             for (int j = 1; j < list.size(); j++) {
                 Program pomj = list.get(j);
-                if (pomi.getName().compareTo(pomj.getName()) == 0 && pomi.getIdKanala() == pomj.getIdKanala()) {
+                if (pomi.getName().compareTo(pomj.getName()) == 0) {
                     found = true;
                     break;
                 }

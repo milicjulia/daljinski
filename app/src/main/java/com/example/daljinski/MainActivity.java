@@ -1,27 +1,22 @@
 package com.example.daljinski;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.StrictMode;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
-
 import com.example.daljinski.baza.BazaDatabase;
 import com.example.daljinski.baza.ChannelDAO;
 import com.example.daljinski.baza.ChannelEntity;
@@ -43,22 +38,22 @@ import com.example.daljinski.ui.MeniFragment;
 import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.ui.RecommendedFragment;
 import com.example.daljinski.ui.TimelineFragment;
-
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity implements STBCommunicationTask.STBTaskListenner, CommunicationServiceConnection.ComServiceListenner {
-    private Button meni1, meni2, meni3;
+    private TabItem meni1, meni2, meni3;
+    private TabLayout tab;
     private List<TimelineFragment> timelines = new ArrayList<>();
     public final static int COMMUNICATION_PORT = 2000;
     private static ArrayList<Channel> channels = new ArrayList<>();
@@ -117,30 +112,30 @@ public class MainActivity extends AppCompatActivity implements STBCommunicationT
     }
 
     public void dodajKomponenteMeni() {
-        meni1 = (Button) findViewById(R.id.meni1);
-        meni2 = (Button) findViewById(R.id.meni2);
-        meni3 = (Button) findViewById(R.id.meni3);
+        meni1 = (TabItem) findViewById(R.id.meni1);
+        meni2 = (TabItem) findViewById(R.id.meni2);
+        meni3 = (TabItem) findViewById(R.id.meni3);
+        tab=(TabLayout) findViewById(R.id.tab);
+        tab.getTabAt(1).select();
         loadFragment(new MeniFragment());
+        tab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab t) {
+                int selectedTab = tab.getSelectedTabPosition();
+                switch(selectedTab){
+                    case 0:loadFragment(new ChannelFragment());break;
+                    case 1:loadFragment(new MeniFragment());break;
+                    case 2:loadFragment(new RecommendedFragment());break;
+                }
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
 
-        meni1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loadFragment(new ChannelFragment());
-            }
-        });
-        meni2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loadFragment(new MeniFragment());
-            }
-        });
-        meni3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loadFragment(new RecommendedFragment());
-            }
-
-        });
     }
 
     public static ArrayList<OmiljeniEntity> getLikes() {

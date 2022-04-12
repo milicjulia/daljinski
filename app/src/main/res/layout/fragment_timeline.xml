@@ -9,7 +9,7 @@
         android:layout_height="250dp"
         android:id="@+id/timeline">
 
-    <HorizontalScrollView
+<HorizontalScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:fillViewport="true"
@@ -23,8 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
-
         </LinearLayout>
+
     </HorizontalScrollView>
     </LinearLayout>
 
