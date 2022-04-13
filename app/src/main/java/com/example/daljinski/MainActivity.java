@@ -1,22 +1,26 @@
 package com.example.daljinski;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.room.Room;
+
 import com.example.daljinski.baza.BazaDatabase;
 import com.example.daljinski.baza.ChannelDAO;
 import com.example.daljinski.baza.ChannelEntity;
@@ -29,33 +33,32 @@ import com.example.daljinski.baza.ZanrProgramDAO;
 import com.example.daljinski.baza.ZanrProgramEntity;
 import com.example.daljinski.baza.ZanroviEntity;
 import com.example.daljinski.entiteti.Channel;
-import com.example.daljinski.komunikacija.CommunicationService;
-import com.example.daljinski.komunikacija.CommunicationServiceConnection;
-import com.example.daljinski.komunikacija.STBCommunication;
-import com.example.daljinski.komunikacija.STBCommunicationTask;
 import com.example.daljinski.ui.ChannelFragment;
 import com.example.daljinski.ui.MeniFragment;
 import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.ui.RecommendedFragment;
 import com.example.daljinski.ui.TimelineFragment;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Set;
+
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
-public class MainActivity extends AppCompatActivity implements STBCommunicationTask.STBTaskListenner, CommunicationServiceConnection.ComServiceListenner {
+public class MainActivity extends AppCompatActivity {
     private TabItem meni1, meni2, meni3;
     private TabLayout tab;
     private List<TimelineFragment> timelines = new ArrayList<>();
-    public final static int COMMUNICATION_PORT = 2000;
     private static ArrayList<Channel> channels = new ArrayList<>();
     private static ArrayList<OmiljeniEntity> likes = new ArrayList<>();
     public BazaDatabase db;
@@ -64,27 +67,80 @@ public class MainActivity extends AppCompatActivity implements STBCommunicationT
     private OmiljeniDAO omiljeniDAO;
     private ZanrDAO zanroviDAO;
     private ZanrProgramDAO zanrProgramDAO;
-    private static CommunicationServiceConnection serviceConnection;
-    private static boolean connected;
-
+    private BluetoothAdapter BA;
+    private Set<BluetoothDevice> pairedDevices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        serviceConnection = new CommunicationServiceConnection(this);
-
         db = Room.databaseBuilder(getApplicationContext(), BazaDatabase.class, "database-name").allowMainThreadQueries().build();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        BA = BluetoothAdapter.getDefaultAdapter();
 
         ucitajJSONKanale(getApplicationContext());
         poveziSaDAO();
         dodajKomponenteMeni();
 
     }
+
+    public void on() {
+        if (!BA.isEnabled()) {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getApplicationContext(), "error on", Toast.LENGTH_LONG).show();
+                return;
+            }
+            startActivityForResult(turnOn, 0);
+            Toast.makeText(getApplicationContext(), "Turned on", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void off() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getApplicationContext(), "error off", Toast.LENGTH_LONG).show();
+            return;
+        }
+        BA.disable();
+        Toast.makeText(getApplicationContext(), "Turned off", Toast.LENGTH_LONG).show();
+    }
+
+
+    public void visible() {
+        Intent getVisible = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                Toast.makeText(getApplicationContext(), "error Visible", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        Toast.makeText(getApplicationContext(), "Visible", Toast.LENGTH_LONG).show();
+        startActivityForResult(getVisible, 0);
+    }
+
+
+    public void list() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                Toast.makeText(getApplicationContext(), "error list", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        pairedDevices = BA.getBondedDevices();
+        Toast.makeText(getApplicationContext(), "Showing Paired Devices", Toast.LENGTH_SHORT).show();
+        for (BluetoothDevice bt : pairedDevices)
+            Toast.makeText(getApplicationContext(), bt.getName(), Toast.LENGTH_SHORT).show();
+
+    }
+
 
     public void poveziSaDAO() {
         channelDao = db.channelDao();
@@ -93,10 +149,10 @@ public class MainActivity extends AppCompatActivity implements STBCommunicationT
         zanroviDAO = db.zanrDAO();
         zanrProgramDAO = db.zanrProgramDAO();
         for (int i = 0; i < channels.size(); i++) {
-            Channel chi=channels.get(i);
-            channelDao.insertChannel(new ChannelEntity(i + 1, chi.getObjectType(),chi.getTotalCount()));
+            Channel chi = channels.get(i);
+            channelDao.insertChannel(new ChannelEntity(i + 1, chi.getObjectType(), chi.getTotalCount()));
             for (int j = 0; j < chi.getPrograms().size(); j++) {
-                Program pj=chi.getPrograms().get(j);
+                Program pj = chi.getPrograms().get(j);
                 channels.get(i).getPrograms().get(j).setIdKanala(i + 1);
                 pj.setId(i * 24 + j + 1);
                 programDao.insertProgram(new ProgramEntity(pj));
@@ -115,22 +171,30 @@ public class MainActivity extends AppCompatActivity implements STBCommunicationT
         meni1 = (TabItem) findViewById(R.id.meni1);
         meni2 = (TabItem) findViewById(R.id.meni2);
         meni3 = (TabItem) findViewById(R.id.meni3);
-        tab=(TabLayout) findViewById(R.id.tab);
+        tab = (TabLayout) findViewById(R.id.tab);
         tab.getTabAt(1).select();
         loadFragment(new MeniFragment());
         tab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab t) {
                 int selectedTab = tab.getSelectedTabPosition();
-                switch(selectedTab){
-                    case 0:loadFragment(new ChannelFragment());break;
-                    case 1:loadFragment(new MeniFragment());break;
-                    case 2:loadFragment(new RecommendedFragment());break;
+                switch (selectedTab) {
+                    case 0:
+                        loadFragment(new ChannelFragment());
+                        break;
+                    case 1:
+                        loadFragment(new MeniFragment());
+                        break;
+                    case 2:
+                        loadFragment(new RecommendedFragment());
+                        break;
                 }
             }
+
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
             }
+
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
             }
@@ -146,13 +210,6 @@ public class MainActivity extends AppCompatActivity implements STBCommunicationT
         return channels;
     }
 
-    public static CommunicationServiceConnection getServiceConnection() {
-        return serviceConnection;
-    }
-
-    public static void setConnected(boolean connected) {
-        MainActivity.connected = connected;
-    }
 
     private void loadFragment(Fragment fragment) {
         FragmentManager fm = getFragmentManager();
@@ -164,43 +221,22 @@ public class MainActivity extends AppCompatActivity implements STBCommunicationT
     @Override
     protected void onStart() {
         super.onStart();
-        bindService(new Intent(getApplicationContext(), CommunicationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+        this.on();
+        this.visible();
+        this.list();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        this.off();
         for (OmiljeniEntity like : likes) {
             omiljeniDAO.insertOmiljen(like);
         }
-        if (serviceConnection.isBound()) {
-            unbindService(serviceConnection);
-            serviceConnection.setBound(false);
-        }
+
 
     }
 
-    public String getLocalIpAddress() {
-        WifiManager wm = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        String ipBinary = null;
-        try {
-            ipBinary = Integer.toBinaryString(wm.getConnectionInfo().getIpAddress());
-        } catch (Exception e) {
-        }
-        if (ipBinary != null) {
-            while (ipBinary.length() < 32) {
-                ipBinary = "0" + ipBinary;
-            }
-            String a = ipBinary.substring(0, 8);
-            String b = ipBinary.substring(8, 16);
-            String c = ipBinary.substring(16, 24);
-            String d = ipBinary.substring(24, 32);
-            String actualIpAddress = Integer.parseInt(d, 2) + "." + Integer.parseInt(c, 2) + "." + Integer.parseInt(b, 2) + "." + Integer.parseInt(a, 2);
-            return actualIpAddress;
-        } else {
-            return null;
-        }
-    }
 
     public void ucitajJSONKanale(Context context) {
         JSONParser jsonParser = new JSONParser();
@@ -211,10 +247,7 @@ public class MainActivity extends AppCompatActivity implements STBCommunicationT
             JSONArray channelsList = (JSONArray) obj;
             for (int i = 0; i < channelsList.size(); i++) {
                 channels.add(parseChannelObject((JSONObject) channelsList.get(i)));
-
             }
-
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException | ParseException e) {
@@ -267,34 +300,4 @@ public class MainActivity extends AppCompatActivity implements STBCommunicationT
     }
 
 
-    @Override
-    public void requestSucceed(String request, String message, String command) {
-        if (STBCommunication.REQUEST_SCAN.equals(request)) {
-            new STBCommunicationTask(this, serviceConnection.getSTBDriver()).execute(STBCommunication.REQUEST_CONNECT, message);
-        } else if (STBCommunication.REQUEST_CONNECT.equals(request)) {
-            connected = true;
-            invalidateOptionsMenu();
-        }
-    }
-
-    @Override
-    public void requestFailed(String request, String message, String command) {
-    }
-
-
-    public void lauchScan() {
-        new STBCommunicationTask(this, serviceConnection.getSTBDriver()).execute(STBCommunication.REQUEST_SCAN, getLocalIpAddress());
-    }
-
-    @Override
-    public void serviceBound() {
-        if (!serviceConnection.getSTBDriver().isConnected()) {
-            lauchScan();
-        }
-    }
-
-    @Override
-    public void serviceUnbind() {
-        connected = false;
-    }
 }

@@ -18,23 +18,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
 import com.example.daljinski.baza.OmiljeniEntity;
 import com.example.daljinski.entiteti.Channel;
 import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.entiteti.Translator;
-import com.example.daljinski.komunikacija.Commands;
-import com.example.daljinski.komunikacija.STBCommunication;
-import com.example.daljinski.komunikacija.STBCommunicationTask;
-
 import java.util.ArrayList;
 
-public class MeniFragment extends Fragment implements RecognitionListener, STBCommunicationTask.STBTaskListenner {
+public class MeniFragment extends Fragment implements RecognitionListener{
     private Button chUp, chDown, volUp, volDown, S;
     private static int volume = 50, channel = 1;
     private TextView txt1, txt2, returnedText;
@@ -130,38 +124,29 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
         });
     }
 
-    private void sendMessageToSTB(String msg) {
-        if (MainActivity.getServiceConnection().isBound()) {
-            Log.d("senMessToSTB", msg);
-            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_COMMAND, msg);
-        }
-    }
+
 
     public void channelDown() {
         if (channel != 1)
             channel -= 1;
         txt2.setText(String.valueOf(channel));
-        sendMessageToSTB(Commands.MOVE_DOWN);
     }
 
     public void channelUp() {
         channel += 1;
         txt2.setText(String.valueOf(channel));
-        sendMessageToSTB(Commands.MOVE_UP);
     }
 
     public void volumeDown() {
         if (volume <= 100 && volume >= 5)
             volume -= 5;
         txt1.setText(String.valueOf(volume));
-        sendMessageToSTB(Commands.SOUND_MINUS);
     }
 
     public void volumeUp() {
         if (volume <= 95 && volume >= 0)
             volume += 5;
         txt1.setText(String.valueOf(volume));
-        sendMessageToSTB(Commands.SOUND_PLUS);
     }
 
 
@@ -354,17 +339,5 @@ public class MeniFragment extends Fragment implements RecognitionListener, STBCo
     }
 
 
-    @Override
-    public void requestSucceed(String request, String message, String command) {
-        if (STBCommunication.REQUEST_SCAN.equals(request)) {
-            new STBCommunicationTask(this, MainActivity.getServiceConnection().getSTBDriver()).execute(STBCommunication.REQUEST_CONNECT, message);
-        } else if (STBCommunication.REQUEST_CONNECT.equals(request)) {
-            MainActivity.setConnected(true);
-        }
-    }
 
-    @Override
-    public void requestFailed(String request, String message, String command) {
-        MainActivity.setConnected(false);
-    }
 }
