@@ -136,8 +136,12 @@ public class MainActivity extends AppCompatActivity {
         }
         pairedDevices = BA.getBondedDevices();
         Toast.makeText(getApplicationContext(), "Showing Paired Devices", Toast.LENGTH_SHORT).show();
+        int i=0;
         for (BluetoothDevice bt : pairedDevices)
-            Toast.makeText(getApplicationContext(), bt.getName(), Toast.LENGTH_SHORT).show();
+            if(i==0){
+                bt.createBond();
+            }
+        i++;
 
     }
 
