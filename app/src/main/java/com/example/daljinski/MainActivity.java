@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                Log.e(TAG, "permission");
+                Log.e(TAG, "permission1");
                 return;
             }
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -107,10 +107,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void pairDevice() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG, "permission");
-            return;
-        }
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             BluetoothDevice device = (BluetoothDevice) pairedDevices.toArray()[0];
@@ -146,10 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             try {
-                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    Log.e(ConnectTag,"permission");
-                    return;
-                }
+              
                 mmSocket.connect();
             } catch (IOException e) {
                 try {
@@ -240,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+/*
     public void on() {
         if (!BA.isEnabled()) {
             Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -298,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+*/
     public void poveziSaDAO() {
         channelDao = db.channelDao();
         programDao = db.programDao();
@@ -378,15 +371,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        this.on();
+     /*   this.on();
         this.visible();
-        this.list();
+        this.list();*/
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        this.off();
+      //  this.off();
         for (OmiljeniEntity like : likes) {
             omiljeniDAO.insertOmiljen(like);
         }
