@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             try {
-              
+
                 mmSocket.connect();
             } catch (IOException e) {
                 try {
