@@ -16,6 +16,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +39,7 @@ import com.example.daljinski.baza.ZanrProgramDAO;
 import com.example.daljinski.baza.ZanrProgramEntity;
 import com.example.daljinski.baza.ZanroviEntity;
 import com.example.daljinski.entiteti.Channel;
+import com.example.daljinski.ui.BluetoothFragment;
 import com.example.daljinski.ui.ChannelFragment;
 import com.example.daljinski.ui.MeniFragment;
 import com.example.daljinski.entiteti.Program;
@@ -45,6 +50,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -73,12 +79,10 @@ public class MainActivity extends AppCompatActivity {
     private OmiljeniDAO omiljeniDAO;
     private ZanrDAO zanroviDAO;
     private ZanrProgramDAO zanrProgramDAO;
-    private BluetoothAdapter BA;
-    private Set<BluetoothDevice> pairedDevices;
     private static final int REQUEST_ENABLE_BT = 1;
-    private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    private BluetoothDevice mmDevice;
-    private ConnectedThread mConnectedThread;
+    public static BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    public static BluetoothDevice mmDevice;
+    public static ConnectedThread mConnectedThread;
     private String TAG = "MainActivity";
 
     @Override
@@ -90,19 +94,58 @@ public class MainActivity extends AppCompatActivity {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
+/*
         if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                Log.e(TAG, "permission1");
-                return;
-            }
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
-        pairDevice();
+            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
+        }else {
+            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+        }*/
+        //pairDevice();
         ucitajJSONKanale(getApplicationContext());
         poveziSaDAO();
         dodajKomponenteMeni();
+
+    }
+
+    public void on(){
+        if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
+        }else {
+            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void list(){
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            ArrayList list = new ArrayList();
+            for(BluetoothDevice bt : pairedDevices){
+                TextView txt=new TextView(getApplicationContext());
+                txt.setText(bt.getName());
+                txt.setOnClickListener(new View.OnClickListener() {
+                    @Override public void onClick(View v) {
+                        Log.i(TAG, "clicked");
+                        Log.e(TAG, "" + bt.getName());
+                        ConnectThread connect = null;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                            connect = new ConnectThread(bt, bt.getUuids()[0].getUuid());
+                        }
+                        connect.start();
+                    }
+                });
+
+            }
+
+        }
+    }
+
+    public void off(){
+    bluetoothAdapter.disable();
+        Toast.makeText(getApplicationContext(), "Turned off" ,Toast.LENGTH_LONG).show();
 
     }
 
@@ -119,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class ConnectThread extends Thread {
+    public static class ConnectThread extends Thread {
         private BluetoothSocket mmSocket;
         private String ConnectTag = "ConnectedThread";
 
@@ -154,17 +197,14 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
                 return;
             }
-            connected(mmSocket);
+            Log.d("Connected", "connected: Starting");
+            mConnectedThread = new ConnectedThread(mmSocket);
+            mConnectedThread.start();
         }
     }
 
-    private void connected(BluetoothSocket mmSocket) {
-        Log.d(TAG, "connected: Starting");
-        mConnectedThread = new ConnectedThread(mmSocket);
-        mConnectedThread.start();
-    }
 
-    private class ConnectedThread extends Thread {
+    public static class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
@@ -233,65 +273,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-/*
-    public void on() {
-        if (!BA.isEnabled()) {
-            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getApplicationContext(), "error on", Toast.LENGTH_LONG).show();
-                return;
-            }
-            startActivityForResult(turnOn, 0);
-            Toast.makeText(getApplicationContext(), "Turned on", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public void off() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getApplicationContext(), "error off", Toast.LENGTH_LONG).show();
-            return;
-        }
-        BA.disable();
-        Toast.makeText(getApplicationContext(), "Turned off", Toast.LENGTH_LONG).show();
-    }
-
-
-    public void visible() {
-        Intent getVisible = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
-                Toast.makeText(getApplicationContext(), "error Visible", Toast.LENGTH_LONG).show();
-                return;
-            }
-        }
-        Toast.makeText(getApplicationContext(), "Visible", Toast.LENGTH_LONG).show();
-        startActivityForResult(getVisible, 0);
-    }
-
-
-    public void list() {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
-                Toast.makeText(getApplicationContext(), "error list", Toast.LENGTH_LONG).show();
-                return;
-            }
-        }
-        pairedDevices = BA.getBondedDevices();
-        Toast.makeText(getApplicationContext(), "Showing Paired Devices", Toast.LENGTH_SHORT).show();
-        int i=0;
-        for (BluetoothDevice bt : pairedDevices)
-            if(i==0){
-                bt.createBond();
-            }
-        i++;
-
-    }
-
-*/
     public void poveziSaDAO() {
         channelDao = db.channelDao();
         programDao = db.programDao();
@@ -318,12 +299,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void dodajKomponenteMeni() {
+        loadFragment(new BluetoothFragment());
         meni1 = (TabItem) findViewById(R.id.meni1);
         meni2 = (TabItem) findViewById(R.id.meni2);
         meni3 = (TabItem) findViewById(R.id.meni3);
         tab = (TabLayout) findViewById(R.id.tab);
         tab.getTabAt(1).select();
-        loadFragment(new MeniFragment());
+        tab.setVisibility(View.INVISIBLE);
         tab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab t) {
@@ -361,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void loadFragment(Fragment fragment) {
+    public void loadFragment(Fragment fragment) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment);

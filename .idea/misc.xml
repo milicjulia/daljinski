@@ -3,18 +3,21 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../Android/Sdk/platforms/android-32/data/res/layout/simple_list_item_1.xml" value="0.1" />
         <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_channel.xml" value="0.1" />
         <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_meni.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_program.xml" value="0.18072916666666666" />
         <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_recommended.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/juliam/Documents/GitHub/daljinski/app/src/main/res/layout/fragment_timeline.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_bluetooth.xml" value="0.26614583333333336" />
         <entry key="app/src/main/res/layout/fragment_channel.xml" value="0.21666666666666667" />
         <entry key="app/src/main/res/layout/fragment_meni.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/fragment_program.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/fragment_recommended.xml" value="0.24436090225563908" />
         <entry key="app/src/main/res/layout/fragment_timeline.xml" value="0.21666666666666667" />
         <entry key="app/src/main/res/layout/meni.xml" value="0.22916666666666666" />
+        <entry key="app/src/main/res/layout/pom.xml" value="0.1" />
       </map>
     </option>
   </component>
