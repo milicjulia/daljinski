@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +15,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,12 +47,17 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
@@ -58,7 +65,6 @@ import com.google.android.material.tabs.TabLayout;
 public class MainActivity extends AppCompatActivity {
     private TabItem meni1, meni2, meni3;
     private TabLayout tab;
-    private List<TimelineFragment> timelines = new ArrayList<>();
     private static ArrayList<Channel> channels = new ArrayList<>();
     private static ArrayList<OmiljeniEntity> likes = new ArrayList<>();
     public BazaDatabase db;
@@ -69,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
     private ZanrProgramDAO zanrProgramDAO;
     private BluetoothAdapter BA;
     private Set<BluetoothDevice> pairedDevices;
+    private static final int REQUEST_ENABLE_BT = 1;
+    private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private BluetoothDevice mmDevice;
+    private ConnectedThread mConnectedThread;
+    private String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,13 +91,155 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        BA = BluetoothAdapter.getDefaultAdapter();
-
+        if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                Log.e(TAG, "permission");
+                return;
+            }
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+        pairDevice();
         ucitajJSONKanale(getApplicationContext());
         poveziSaDAO();
         dodajKomponenteMeni();
 
     }
+
+    public void pairDevice() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            Log.e(TAG, "permission");
+            return;
+        }
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            BluetoothDevice device = (BluetoothDevice) pairedDevices.toArray()[0];
+            Log.e(TAG, "" + device.getName());
+            ConnectThread connect = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                connect = new ConnectThread(device, device.getUuids()[0].getUuid());
+            }
+            connect.start();
+        }
+    }
+
+    private class ConnectThread extends Thread {
+        private BluetoothSocket mmSocket;
+        private String ConnectTag = "ConnectedThread";
+
+        public ConnectThread(BluetoothDevice device, UUID uuid) {
+            Log.d(ConnectTag, "Started.");
+            mmDevice = device;
+        }
+
+        public void run() {
+            Log.i(ConnectTag, "Run");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                try {
+                    mmSocket = (BluetoothSocket) mmDevice.getClass().getMethod("createInsecureRfcommSocket", new Class[]{int.class}).invoke(mmDevice, 1);
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    Log.e(ConnectTag,"permission");
+                    return;
+                }
+                mmSocket.connect();
+            } catch (IOException e) {
+                try {
+                    mmSocket.close();
+                    Log.d(ConnectTag, "Closed Socket");
+                } catch (IOException e1) {
+                    Log.e(ConnectTag, "Unable to close socket connection");
+                }
+                e.printStackTrace();
+                return;
+            }
+            connected(mmSocket);
+        }
+    }
+
+    private void connected(BluetoothSocket mmSocket) {
+        Log.d(TAG, "connected: Starting");
+        mConnectedThread = new ConnectedThread(mmSocket);
+        mConnectedThread.start();
+    }
+
+    private class ConnectedThread extends Thread {
+        private final BluetoothSocket mmSocket;
+        private final InputStream mmInStream;
+        private final OutputStream mmOutStream;
+        private String ConnectedTag="ConnectedThread";
+
+        public ConnectedThread(BluetoothSocket socket) {
+            Log.d(ConnectedTag, "Starting");
+            mmSocket = socket;
+            InputStream tmpIn = null;
+            OutputStream tmpOut = null;
+
+            try {
+                tmpIn = mmSocket.getInputStream();
+                tmpOut = mmSocket.getOutputStream();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mmInStream = tmpIn;
+            mmOutStream = tmpOut;
+        }
+
+        public void chUp() {
+
+        }
+
+        public void chDown() {
+
+        }
+
+        public void volUp() {
+
+        }
+
+        public void volDown() {
+
+        }
+
+        public void play(int command) {
+            int toChannel = command - (int) (command / 10);
+        }
+
+        public void run() {
+            byte[] buffer = new byte[1024];
+            int bytes;
+            while (true) {
+                try {
+                    final String incomingMessage = new String("1");
+                    Log.d(ConnectedTag, "write: Writing to outputstream: " + 1);
+                    mmOutStream.write(Integer.parseInt(incomingMessage));
+                } catch (IOException e) {
+                    Log.e(ConnectedTag, "write: Error reading Input Stream. " + e.getMessage());
+                    break;
+                }
+            }
+        }
+
+        public void write(byte[] bytes) {
+            String text = new String(bytes, Charset.defaultCharset());
+            Log.d(ConnectedTag, "write: Writing to outputstream: " + text);
+            try {
+                mmOutStream.write(bytes);
+            } catch (IOException e) {
+                Log.e(ConnectedTag, "write: Error writing to output stream. " + e.getMessage());
+            }
+        }
+    }
+
+
 
     public void on() {
         if (!BA.isEnabled()) {
