@@ -3,6 +3,7 @@ package com.example.daljinski.ui;
 import android.app.Fragment;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -41,13 +42,16 @@ public class ProgramFragment extends Fragment {
                 if (myid == dosad) {
                     dodajNaziv(j, k);
                     dodajVreme(j, k);
-                    ly = new LinearLayout(getContext());
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250);
-                    ly.setLayoutParams(layoutParams);
-                    layoutParams.gravity = Gravity.RIGHT;
-                    dodajDugmeGledaj(j);
-                    dodajDugmeOmiljen(j, k);
-                    sv.addView(ly);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        ly = new LinearLayout(getContext());
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 250);
+                        ly.setLayoutParams(layoutParams);
+                        layoutParams.gravity = Gravity.RIGHT;
+                        dodajDugmeGledaj(j);
+                        dodajDugmeOmiljen(j, k);
+                        sv.addView(ly);
+                    }
+
                 }
                 dosad += 1;
             }
@@ -62,47 +66,65 @@ public class ProgramFragment extends Fragment {
     }
 
     public void dodajNaziv(int k, int p) {
+        TextView nazivt = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            nazivt = new TextView(this.getContext());
+            nazivt.setLayoutParams(paramsTxt);
+            nazivt.setTextSize(12);
+            nazivt.setText(MainActivity.getChannels().get(k).getPrograms().get(p).getName());
+            sv.addView(nazivt);
+        }
 
-        TextView nazivt = new TextView(this.getContext());
-        nazivt.setLayoutParams(paramsTxt);
-        nazivt.setTextSize(12);
-        nazivt.setText(MainActivity.getChannels().get(k).getPrograms().get(p).getName());
-        sv.addView(nazivt);
     }
 
     public void dodajVreme(int k, int p) {
-        TextView vremet = new TextView(this.getContext());
-        vremet.setLayoutParams(paramsTxt);
-        vremet.setTextSize(10);
-        Timestamp time = new Timestamp(MainActivity.getChannels().get(k).getPrograms().get(p).getStartDate());
-        vremet.setText(time.getHours() + ":" + time.getMinutes());
-        sv.addView(vremet);
+        TextView vremet = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            vremet = new TextView(this.getContext());
+            vremet.setLayoutParams(paramsTxt);
+            vremet.setTextSize(10);
+            Timestamp time = new Timestamp(MainActivity.getChannels().get(k).getPrograms().get(p).getStartDate());
+            vremet.setText(time.getHours() + ":" + time.getMinutes());
+            sv.addView(vremet);
+        }
+
     }
 
     public void dodajDugmeGledaj(int k) {
-        gledaj = (MaterialButton) new MaterialButton(this.getContext());
-        gledaj.setText("Gledaj");
-        gledaj.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MeniFragment.setChannel(k + 1);
-            }
-        });
-        ly.addView(gledaj);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            gledaj = (MaterialButton) new MaterialButton(this.getContext());
+            gledaj.setText("Gledaj");
+            gledaj.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    MeniFragment.setChannel(k + 1);
+                    try {
+                        MainActivity.mConnectedThread.queue.put(5*10+k+1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            ly.addView(gledaj);
+        }
+
     }
 
     public void dodajDugmeOmiljen(int k, int p) {
-        o = (Button) new Button(this.getContext());
-        o.setLayoutParams(paramsSlike);
-        o.setBackground(ChannelFragment.getSrceSlika().getDrawable());
-        o.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MeniFragment.setOmiljen(k, p);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            o = (Button) new Button(this.getContext());
+            o.setLayoutParams(paramsSlike);
+            o.setBackground(ChannelFragment.getSrceSlika().getDrawable());
+            o.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    MeniFragment.setOmiljen(k, p);
 
-            }
-        });
-        ly.addView(o);
+                }
+            });
+            ly.addView(o);
+        }
+
     }
 
 

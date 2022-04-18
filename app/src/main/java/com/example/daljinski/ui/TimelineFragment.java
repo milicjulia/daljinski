@@ -56,11 +56,14 @@ public class TimelineFragment extends Fragment {
 
     public void dodajSliku() {
         try {
-            ImageView iv=new ImageView(this.getContext());
-            iv.setLayoutParams(new FrameLayout.LayoutParams(150,250));
-            InputStream istr = getContext().getAssets().open(mojid==0?"rts.jpg":"disney.jpg");
-            iv.setImageDrawable(Drawable.createFromStream(istr, null));
-            sv.addView(iv);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                ImageView iv = new ImageView(this.getContext());
+                iv.setLayoutParams(new FrameLayout.LayoutParams(150,250));
+                InputStream istr = getContext().getAssets().open(mojid==0?"rts.jpg":"disney.jpg");
+                iv.setImageDrawable(Drawable.createFromStream(istr, null));
+                sv.addView(iv);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -70,30 +73,21 @@ public class TimelineFragment extends Fragment {
     public void dodajPrograme() {
         int brprograma= MainActivity.getChannels().get(mojid).getPrograms().size();
         for(int k=0;k<brprograma;k++){
-            FrameLayout f = new FrameLayout(this.getContext());
-            f.setClickable(true);
-            f.setLayoutParams(params);
-            f.setId(R.id.timelinefragment+mojid*brprograma+k);
-            sv.addView(f);
-            FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-            ft.replace(R.id.timelinefragment+mojid*brprograma+k, new ProgramFragment());
-            ft.commit();
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                FrameLayout f = new FrameLayout(this.getContext());
+                f.setClickable(true);
+                f.setLayoutParams(params);
+                f.setId(R.id.timelinefragment+mojid*brprograma+k);
+                sv.addView(f);
+                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                ft.replace(R.id.timelinefragment+mojid*brprograma+k, new ProgramFragment());
+                ft.commit();
+            }
+
         }
-
-
 
     }
 
-    private Drawable LoadImageFromWebOperations(String url) {
-        try {
-            InputStream is = (InputStream) new URL(url).getContent();
-            Drawable d = Drawable.createFromStream(is, "src name");
-            return d;
-        } catch (Exception e) {
-            System.out.println("Exc=" + e);
-            return null;
-        }
-    }
 
 
 }

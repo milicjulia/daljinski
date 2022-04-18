@@ -4,38 +4,53 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
 import com.example.daljinski.baza.OmiljeniEntity;
 import com.example.daljinski.entiteti.Channel;
 import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.entiteti.Translator;
+import com.google.android.material.button.MaterialButton;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
-public class MeniFragment extends Fragment implements RecognitionListener{
-    private Button chUp, chDown, volUp, volDown, S;
+public class MeniFragment extends Fragment implements RecognitionListener {
+    private Button chUp, chDown, volUp, volDown, S, bluetooth;
     private static int volume = 50, channel = 1;
     private TextView txt1, txt2, returnedText;
     private SpeechRecognizer speech = null;
     private Intent recognizerIntent;
     private String LOG_TAG = "VoiceRecognitionActivity";
     private static final int REQUEST_INTERNET = 200;
+    private ImageView bluetoothSlika;
     View view;
 
     public static int getChannel() {
@@ -56,6 +71,7 @@ public class MeniFragment extends Fragment implements RecognitionListener{
         return view;
     }
 
+
     public void dodajZaSpeech() {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_INTERNET);
@@ -70,6 +86,7 @@ public class MeniFragment extends Fragment implements RecognitionListener{
     }
 
     public void dodajKomponente() {
+        bluetooth = (Button) view.findViewById(R.id.bluetoothButton);
         chUp = (Button) view.findViewById(R.id.chup);
         chDown = (Button) view.findViewById(R.id.chdown);
         volUp = (Button) view.findViewById(R.id.volup);
@@ -122,31 +139,65 @@ public class MeniFragment extends Fragment implements RecognitionListener{
                 volumeUp();
             }
         });
+
+        bluetooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadFragment();
+            }
+        });
     }
 
+    public void loadFragment() {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        fragmentTransaction.replace(R.id.frame, new BluetoothFragment());
+        fragmentTransaction.commit();
+        MainActivity.tab.setVisibility(View.INVISIBLE);
+    }
 
 
     public void channelDown() {
         if (channel != 1)
             channel -= 1;
         txt2.setText(String.valueOf(channel));
+        try {
+            MainActivity.mConnectedThread.queue.put(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void channelUp() {
         channel += 1;
         txt2.setText(String.valueOf(channel));
+        try {
+            MainActivity.mConnectedThread.queue.put(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void volumeDown() {
         if (volume <= 100 && volume >= 5)
             volume -= 5;
         txt1.setText(String.valueOf(volume));
+        try {
+            MainActivity.mConnectedThread.queue.put(4);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void volumeUp() {
         if (volume <= 95 && volume >= 0)
             volume += 5;
         txt1.setText(String.valueOf(volume));
+        try {
+            MainActivity.mConnectedThread.queue.put(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -222,7 +273,7 @@ public class MeniFragment extends Fragment implements RecognitionListener{
 
     @Override
     public void onPartialResults(Bundle arg0) {
-       // Log.i(LOG_TAG, "onPartialResults");
+        // Log.i(LOG_TAG, "onPartialResults");
     }
 
     @Override
@@ -259,7 +310,10 @@ public class MeniFragment extends Fragment implements RecognitionListener{
                 }
                 if (pretraga != null) {
                     MeniFragment.setChannel(pretraga.getIdKanala());
-                    Log.d("prikazuje ", String.valueOf(pretraga.getIdKanala()));Log.d("prikazuje ", pretraga.getName());Log.d("prikazuje ", pretraga.getDescription());
+                    MainActivity.mConnectedThread.queue.put(5 * 10 + pretraga.getIdKanala());
+                    Log.d("prikazuje ", String.valueOf(pretraga.getIdKanala()));
+                    Log.d("prikazuje ", pretraga.getName());
+                    Log.d("prikazuje ", pretraga.getDescription());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -270,7 +324,6 @@ public class MeniFragment extends Fragment implements RecognitionListener{
 
     @Override
     public void onRmsChanged(float rmsdB) {
-        //Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
     }
 
     public static String getErrorText(int errorCode) {
@@ -337,7 +390,6 @@ public class MeniFragment extends Fragment implements RecognitionListener{
         TimelineFragment.setId(0);
         ProgramFragment.setId(0);
     }
-
 
 
 }

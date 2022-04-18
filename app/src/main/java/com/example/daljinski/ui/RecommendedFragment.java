@@ -23,11 +23,14 @@ import com.google.android.material.button.MaterialButton;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class RecommendedFragment extends Fragment {
@@ -62,7 +65,7 @@ public class RecommendedFragment extends Fragment {
         for (Program p : recommend()) {
             naziv.get(i).setText(p.getName());
             time = new Timestamp(p.getStartDate());
-            vreme.get(i).setText("       "+time.getHours() + ":" + time.getMinutes());
+            vreme.get(i).setText(time.getHours() + ":" + time.getMinutes());
             opis.get(i).setText(p.getDescription());
             int finalI = i;
             gledaj.get(i).setOnTouchListener(new View.OnTouchListener() {
@@ -98,8 +101,10 @@ public class RecommendedFragment extends Fragment {
     }
 
     public static HashMap<Integer, Integer> sortByKol(HashMap<Integer, Integer> hm) {
-        HashMap<Integer, Integer> temp = hm.entrySet().stream().sorted((i1, i2) -> i1.getValue().compareTo(i2.getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+        HashMap<Integer, Integer> temp = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            temp = hm.entrySet().stream().sorted((i1, i2) -> i1.getValue().compareTo(i2.getValue())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+        }
         return temp;
     }
 
@@ -107,32 +112,35 @@ public class RecommendedFragment extends Fragment {
 
         if (MainActivity.getLikes().size() == 0) addRandom(0);
         else {
-            BazaDatabase db = Room.databaseBuilder(getContext(), BazaDatabase.class, "database-name").allowMainThreadQueries().build();
             ArrayList<OmiljeniEntity> o = MainActivity.getLikes();
             ArrayList<ProgramEntity> programEntities = new ArrayList<>();
-            for (OmiljeniEntity oe : o) {
-                if (oe.getKolicina() == 0) o.remove(oe);
+
+            BazaDatabase db = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                db = Room.databaseBuilder(getContext(), BazaDatabase.class, "database-name").allowMainThreadQueries().build();
             }
             ArrayList<ZanrProgramEntity> programsForGenre = new ArrayList<>(); //svi programi koji sadrze lajkovane zanrove
-            for (OmiljeniEntity oe : o) {
-                for (ZanrProgramEntity zpe : db.zanrProgramDAO().getProgramsForGenre(oe.getTip())) {
-                    programsForGenre.add(zpe);
-                }
-            }
+            for (OmiljeniEntity oe : o) programsForGenre.addAll(db.zanrProgramDAO().getProgramsForGenre(oe.getTip()));
+
             HashMap<Integer, Integer> frequencymap = new HashMap<Integer, Integer>();
             for (ZanrProgramEntity zpe : programsForGenre) { //od svih programa sa lajkovanim zanrovima, pravim hash mapu sa koliko puta se koji program pojvaljuje
                 if (frequencymap.containsKey(zpe.getIdPrograma())) {
                     frequencymap.put(zpe.getIdPrograma(), frequencymap.get(zpe.getIdPrograma()) + 1);
                 } else frequencymap.put(zpe.getIdPrograma(), 1);
             }
-            frequencymap = sortByKol(frequencymap);
 
-            List<Integer> top = frequencymap.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList());
-            if (top.size() >= 3) {
-                for (int i = 0; i < 3; i++) { //nadjem id top 3 porgrama koja se najvise pojavljuju
-                    ProgramEntity ppp = db.programDao().getProgram(top.get(i).intValue());
-                    programEntities.add(ppp);
+            Set<Integer> keys = frequencymap.keySet();
+            TreeSet<Integer> smallest = new TreeSet<>(new Comparator<Integer>(){
+                public int compare(Integer o1, Integer o2) {
+                    return o1 - o2;
                 }
+            });
+            smallest.addAll(keys);
+            for(int x = 0; x < 3; x++) {
+                int s=smallest.pollFirst();
+                ProgramEntity ppp = db.programDao().getProgram(s);
+                programEntities.add(ppp);
+                keys.remove(s);
             }
 
             for (ProgramEntity pe : programEntities) {
@@ -146,7 +154,6 @@ public class RecommendedFragment extends Fragment {
             }
 
         }
-
 
         return p;
     }

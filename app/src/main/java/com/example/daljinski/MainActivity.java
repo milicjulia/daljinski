@@ -1,32 +1,18 @@
 package com.example.daljinski;
 
-import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.room.Room;
-
 import com.example.daljinski.baza.BazaDatabase;
 import com.example.daljinski.baza.ChannelDAO;
 import com.example.daljinski.baza.ChannelEntity;
@@ -38,39 +24,29 @@ import com.example.daljinski.baza.ZanrDAO;
 import com.example.daljinski.baza.ZanrProgramDAO;
 import com.example.daljinski.baza.ZanrProgramEntity;
 import com.example.daljinski.baza.ZanroviEntity;
+import com.example.daljinski.bluetooth.ConnectedThread;
 import com.example.daljinski.entiteti.Channel;
 import com.example.daljinski.ui.BluetoothFragment;
 import com.example.daljinski.ui.ChannelFragment;
 import com.example.daljinski.ui.MeniFragment;
 import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.ui.RecommendedFragment;
-import com.example.daljinski.ui.TimelineFragment;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.w3c.dom.Text;
-
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Set;
-import java.util.UUID;
 
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
     private TabItem meni1, meni2, meni3;
-    private TabLayout tab;
+    public static TabLayout tab;
     private static ArrayList<Channel> channels = new ArrayList<>();
     private static ArrayList<OmiljeniEntity> likes = new ArrayList<>();
     public BazaDatabase db;
@@ -79,11 +55,15 @@ public class MainActivity extends AppCompatActivity {
     private OmiljeniDAO omiljeniDAO;
     private ZanrDAO zanroviDAO;
     private ZanrProgramDAO zanrProgramDAO;
-    private static final int REQUEST_ENABLE_BT = 1;
     public static BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     public static BluetoothDevice mmDevice;
     public static ConnectedThread mConnectedThread;
     private String TAG = "MainActivity";
+    public static ChannelFragment channelFragment;
+    public static BluetoothFragment bluetoothFragment;
+    public static MeniFragment meniFragment;
+    public static RecommendedFragment recommendedFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,184 +74,28 @@ public class MainActivity extends AppCompatActivity {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-/*
-        if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
-        }else {
-            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
-        }*/
-        //pairDevice();
+
         ucitajJSONKanale(getApplicationContext());
         poveziSaDAO();
+        channelFragment=new ChannelFragment();
+        meniFragment=new MeniFragment();
+        bluetoothFragment=new BluetoothFragment();
+        recommendedFragment=new RecommendedFragment();
+        dodajKomponenteMeni();
         dodajKomponenteMeni();
 
     }
 
-    public void on(){
-        if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
-        }else {
-            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public void list(){
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        if (pairedDevices.size() > 0) {
-            ArrayList list = new ArrayList();
-            for(BluetoothDevice bt : pairedDevices){
-                TextView txt=new TextView(getApplicationContext());
-                txt.setText(bt.getName());
-                txt.setOnClickListener(new View.OnClickListener() {
-                    @Override public void onClick(View v) {
-                        Log.i(TAG, "clicked");
-                        Log.e(TAG, "" + bt.getName());
-                        ConnectThread connect = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                            connect = new ConnectThread(bt, bt.getUuids()[0].getUuid());
-                        }
-                        connect.start();
-                    }
-                });
-
-            }
-
-        }
-    }
-
-    public void off(){
-    bluetoothAdapter.disable();
-        Toast.makeText(getApplicationContext(), "Turned off" ,Toast.LENGTH_LONG).show();
+    public void off() {
+        MainActivity.bluetoothAdapter.disable();
+        Toast.makeText(getApplicationContext(), "Turned off", Toast.LENGTH_LONG).show();
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        fragmentTransaction.replace(R.id.frame, bluetoothFragment);
+        fragmentTransaction.commit();
+        MainActivity.tab.setVisibility(View.INVISIBLE);
 
     }
-
-    public void pairDevice() {
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        if (pairedDevices.size() > 0) {
-            BluetoothDevice device = (BluetoothDevice) pairedDevices.toArray()[0];
-            Log.e(TAG, "" + device.getName());
-            ConnectThread connect = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                connect = new ConnectThread(device, device.getUuids()[0].getUuid());
-            }
-            connect.start();
-        }
-    }
-
-    public static class ConnectThread extends Thread {
-        private BluetoothSocket mmSocket;
-        private String ConnectTag = "ConnectedThread";
-
-        public ConnectThread(BluetoothDevice device, UUID uuid) {
-            Log.d(ConnectTag, "Started.");
-            mmDevice = device;
-        }
-
-        public void run() {
-            Log.i(ConnectTag, "Run");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                try {
-                    mmSocket = (BluetoothSocket) mmDevice.getClass().getMethod("createInsecureRfcommSocket", new Class[]{int.class}).invoke(mmDevice, 1);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                }
-            }
-            try {
-
-                mmSocket.connect();
-            } catch (IOException e) {
-                try {
-                    mmSocket.close();
-                    Log.d(ConnectTag, "Closed Socket");
-                } catch (IOException e1) {
-                    Log.e(ConnectTag, "Unable to close socket connection");
-                }
-                e.printStackTrace();
-                return;
-            }
-            Log.d("Connected", "connected: Starting");
-            mConnectedThread = new ConnectedThread(mmSocket);
-            mConnectedThread.start();
-        }
-    }
-
-
-    public static class ConnectedThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
-        private String ConnectedTag="ConnectedThread";
-
-        public ConnectedThread(BluetoothSocket socket) {
-            Log.d(ConnectedTag, "Starting");
-            mmSocket = socket;
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-
-            try {
-                tmpIn = mmSocket.getInputStream();
-                tmpOut = mmSocket.getOutputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
-        }
-
-        public void chUp() {
-
-        }
-
-        public void chDown() {
-
-        }
-
-        public void volUp() {
-
-        }
-
-        public void volDown() {
-
-        }
-
-        public void play(int command) {
-            int toChannel = command - (int) (command / 10);
-        }
-
-        public void run() {
-            byte[] buffer = new byte[1024];
-            int bytes;
-            while (true) {
-                try {
-                    final String incomingMessage = new String("1");
-                    Log.d(ConnectedTag, "write: Writing to outputstream: " + 1);
-                    mmOutStream.write(Integer.parseInt(incomingMessage));
-                } catch (IOException e) {
-                    Log.e(ConnectedTag, "write: Error reading Input Stream. " + e.getMessage());
-                    break;
-                }
-            }
-        }
-
-        public void write(byte[] bytes) {
-            String text = new String(bytes, Charset.defaultCharset());
-            Log.d(ConnectedTag, "write: Writing to outputstream: " + text);
-            try {
-                mmOutStream.write(bytes);
-            } catch (IOException e) {
-                Log.e(ConnectedTag, "write: Error writing to output stream. " + e.getMessage());
-            }
-        }
-    }
-
 
     public void poveziSaDAO() {
         channelDao = db.channelDao();
@@ -299,26 +123,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void dodajKomponenteMeni() {
-        loadFragment(new BluetoothFragment());
         meni1 = (TabItem) findViewById(R.id.meni1);
         meni2 = (TabItem) findViewById(R.id.meni2);
         meni3 = (TabItem) findViewById(R.id.meni3);
         tab = (TabLayout) findViewById(R.id.tab);
         tab.getTabAt(1).select();
-        tab.setVisibility(View.INVISIBLE);
+        loadFragment(meniFragment);
         tab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab t) {
                 int selectedTab = tab.getSelectedTabPosition();
                 switch (selectedTab) {
                     case 0:
-                        loadFragment(new ChannelFragment());
+                        loadFragment(channelFragment);
                         break;
                     case 1:
-                        loadFragment(new MeniFragment());
+                        loadFragment(meniFragment);
                         break;
                     case 2:
-                        loadFragment(new RecommendedFragment());
+                        loadFragment(recommendedFragment);
                         break;
                 }
             }
@@ -331,8 +154,11 @@ public class MainActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+        loadFragment(bluetoothFragment);
+        tab.setVisibility(View.INVISIBLE);
 
     }
+
 
     public static ArrayList<OmiljeniEntity> getLikes() {
         return likes;
@@ -353,15 +179,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-     /*   this.on();
-        this.visible();
-        this.list();*/
     }
 
     @Override
     public void onStop() {
         super.onStop();
-      //  this.off();
+        off();
         for (OmiljeniEntity like : likes) {
             omiljeniDAO.insertOmiljen(like);
         }

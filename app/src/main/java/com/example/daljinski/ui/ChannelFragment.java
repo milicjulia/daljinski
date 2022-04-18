@@ -3,6 +3,7 @@ package com.example.daljinski.ui;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -26,28 +27,23 @@ public class ChannelFragment extends Fragment {
     static ArrayList<FrameLayout> frames = new ArrayList<>();
     static ImageView srceSlika;
 
-    public static ArrayList<FrameLayout> getFrames() {
-        return frames;
-    }
 
     public static ImageView getSrceSlika() {
         return srceSlika;
     }
 
-    public static void setSrceSlika(ImageView srceSlika) {
-        ChannelFragment.srceSlika = srceSlika;
-    }
-
-
     public void dodajSliku() {
-        srceSlika = new ImageView(this.getContext());
-        srceSlika.setLayoutParams(new FrameLayout.LayoutParams(25, 25,Gravity.LEFT));
-        try {
-            InputStream istr = getContext().getAssets().open("heart.png");
-            srceSlika.setImageDrawable(Drawable.createFromStream(istr, null));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            srceSlika = new ImageView(this.getContext());
+            srceSlika.setLayoutParams(new FrameLayout.LayoutParams(25, 25, Gravity.LEFT));
+            try {
+                InputStream istr = getContext().getAssets().open("heart.png");
+                srceSlika.setImageDrawable(Drawable.createFromStream(istr, null));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
 
     }
 
@@ -55,23 +51,28 @@ public class ChannelFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_channel, container, false);
         layout = (LinearLayout) view.findViewById(R.id.linearlayout1);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 250, Gravity.CENTER);
         dodajSliku();
-        dodajKanale();
+        dodajKanale(params);
         return view;
     }
 
-    public void dodajKanale() {
+    public void dodajKanale(ViewGroup.LayoutParams params) {
         int brkonala = MainActivity.getChannels().size();
         for (int i = 0; i < brkonala; i++) {
-            FrameLayout f = new FrameLayout(getContext());
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 250, Gravity.CENTER);
-            f.setLayoutParams(params);
-            f.setId(R.id.channelfragment+i);
-            frames.add(f);
-            layout.addView(f);
-            FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-            ft.replace(R.id.channelfragment+i, new TimelineFragment());
-            ft.commit();
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                FrameLayout f = new FrameLayout(getContext());
+                f.setLayoutParams(params);
+                f.setId(R.id.channelfragment + i);
+                frames.add(f);
+                layout.addView(f);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                    ft.replace(R.id.channelfragment + i, new TimelineFragment());
+                    ft.commit();
+                }
+            }
+
 
         }
     }
@@ -79,26 +80,26 @@ public class ChannelFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("ChannelFragment","start");
+        Log.d("ChannelFragment", "start");
 
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("ChannelFragment","resume");
+        Log.d("ChannelFragment", "resume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("ChannelFragment","pause");
+        Log.d("ChannelFragment", "pause");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.d("ChannelFragment","stop");
+        Log.d("ChannelFragment", "stop");
         TimelineFragment.setId(0);
         ProgramFragment.setId(0);
     }

@@ -18,14 +18,6 @@
         android:clickable="true"/>
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Off"
-        android:id="@+id/button4"
-        android:layout_toRightOf="@+id/button"
-        />
-
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"

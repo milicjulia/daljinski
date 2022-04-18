@@ -29,6 +29,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
+import com.example.daljinski.bluetooth.ConnectThread;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,9 +38,8 @@ import java.util.Set;
 
 public class BluetoothFragment extends Fragment {
     public View view;
-    public Button b1,b4;
+    public Button b1;
     public ListView lv;
-    public Set<BluetoothDevice> pairedDevices;
     public RelativeLayout rl;
 
 
@@ -73,6 +73,8 @@ public class BluetoothFragment extends Fragment {
         }
     }
 
+
+
     @Override
     public void onStart() {
         super.onStart();
@@ -104,7 +106,6 @@ public class BluetoothFragment extends Fragment {
         Log.i("Bluetooth", String.valueOf(pairedDevices.size()));
         int pos=200;
         if (pairedDevices.size() > 0) {
-            ArrayList list = new ArrayList();
             for(BluetoothDevice bt : pairedDevices){
                 TextView txt=new TextView(view.getContext());
                 txt.setText(bt.getName());
@@ -114,15 +115,13 @@ public class BluetoothFragment extends Fragment {
                     @Override public void onClick(View v) {
                         Log.i("Bluetooth", "clicked");
                         Log.e("Bluetooth", "" + bt.getName());
-                        MainActivity.ConnectThread connect = null;
+                        ConnectThread connect = null;
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                            connect = new MainActivity.ConnectThread(bt, bt.getUuids()[0].getUuid());
+                            connect = new ConnectThread(bt, bt.getUuids()[0].getUuid());
                         }
                         connect.start();
-                        FragmentManager fm = getFragmentManager();
-                        FragmentTransaction fragmentTransaction = fm.beginTransaction();
-                        fragmentTransaction.replace(R.id.frame, new MeniFragment());
-                        fragmentTransaction.commit();
+                        loadFragment();
+
                     }
                 });
                 rl.addView(txt);
@@ -130,6 +129,14 @@ public class BluetoothFragment extends Fragment {
             }
 
         }
+    }
+
+    public void loadFragment(){
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        fragmentTransaction.replace(R.id.frame, new MeniFragment());
+        fragmentTransaction.commit();
+        MainActivity.tab.setVisibility(View.VISIBLE);
     }
 
 
