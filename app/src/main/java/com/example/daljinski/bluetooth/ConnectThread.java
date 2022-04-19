@@ -13,28 +13,26 @@ import java.util.UUID;
 
 public  class ConnectThread extends Thread {
     private BluetoothSocket mmSocket;
-    private String ConnectTag = "ConnectedThread";
+    private String ConnectTag = "ConnectThread";
+    private static  UUID myuuid= UUID.fromString("0000110a-0100-1000-8000-20805f9b34fb");
 
     public ConnectThread(BluetoothDevice device, UUID uuid) {
         Log.d(ConnectTag, "Started.");
         MainActivity.mmDevice = device;
+        try {
+            //   mmSocket = (BluetoothSocket) MainActivity.mmDevice.getClass().getMethod("createInsecureRfcommSocket", new Class[]{int.class}).invoke(MainActivity.mmDevice, 1);
+            mmSocket = MainActivity.mmDevice.createRfcommSocketToServiceRecord(myuuid);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void run() {
         Log.i(ConnectTag, "Run");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-            try {
-                mmSocket = (BluetoothSocket) MainActivity.mmDevice.getClass().getMethod("createInsecureRfcommSocket", new Class[]{int.class}).invoke(MainActivity.mmDevice, 1);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
 
+        try {
+            MainActivity.bluetoothAdapter.cancelDiscovery();
             mmSocket.connect();
         } catch (IOException e) {
             try {

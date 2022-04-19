@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ConnectedThread extends Thread {
-    public final LinkedBlockingQueue<Integer> queue;
+    public  LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
     private final BluetoothSocket mmSocket;
     private final OutputStream mmOutStream;
     private String ConnectedTag = "ConnectedThread";
@@ -23,7 +23,7 @@ public class ConnectedThread extends Thread {
             e.printStackTrace();
         }
         mmOutStream = tmpOut;
-        queue = new LinkedBlockingQueue<>();
+
     }
 
 

@@ -38,24 +38,32 @@ import java.util.Set;
 
 public class BluetoothFragment extends Fragment {
     public View view;
-    public Button b1;
+    public Button b1, b2;
     public ListView lv;
-    public RelativeLayout rl;
+    public LinearLayout rl;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_bluetooth, container, false);
 
-        b1 = (Button) view.findViewById(R.id.button);
+        b1 = (Button) view.findViewById(R.id.buttonOn);
+        b2 = (Button) view.findViewById(R.id.buttonOff);
         lv = (ListView) view.findViewById(R.id.listView);
-        rl = (RelativeLayout) view.findViewById(R.id.bt);
+        rl = (LinearLayout) view.findViewById(R.id.bt);
 
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 on();
                 list();
+            }
+        });
+
+        b2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+              off();
             }
         });
 
@@ -70,7 +78,14 @@ public class BluetoothFragment extends Fragment {
             Toast.makeText(view.getContext(), "Turned on",Toast.LENGTH_LONG).show();
         }else {
             Toast.makeText(view.getContext(), "Already on", Toast.LENGTH_LONG).show();
+
         }
+    }
+
+    public void off() {
+        MainActivity.bluetoothAdapter.disable();
+        Toast.makeText(view.getContext(), "Turned off", Toast.LENGTH_LONG).show();
+        MainActivity.tab.setVisibility(View.INVISIBLE);
     }
 
 
@@ -118,6 +133,7 @@ public class BluetoothFragment extends Fragment {
                         ConnectThread connect = null;
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                             connect = new ConnectThread(bt, bt.getUuids()[0].getUuid());
+                            Log.d("UUID",bt.getUuids()[0].getUuid().toString());
                         }
                         connect.start();
                         loadFragment();

@@ -143,6 +143,7 @@ public class MeniFragment extends Fragment implements RecognitionListener {
         bluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MainActivity.bluetoothFragment.off();
                 loadFragment();
             }
         });
