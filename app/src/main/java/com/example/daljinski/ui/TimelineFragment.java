@@ -27,8 +27,7 @@ import java.net.URL;
 public class TimelineFragment extends Fragment {
     private ImageView channelPicture;
     View view;
-    private LinearLayout sv, timeline;
-    private HorizontalScrollView skrol;
+    private LinearLayout sv;
     FrameLayout.LayoutParams params;
 
 
@@ -43,9 +42,9 @@ public class TimelineFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_timeline, container, false);
-        skrol=(HorizontalScrollView) view.findViewById(R.id.skrol);
+        HorizontalScrollView skrol = (HorizontalScrollView) view.findViewById(R.id.skrol);
         sv=(LinearLayout) view.findViewById(R.id.kanalisvitimeline);
-        timeline=(LinearLayout) view.findViewById(R.id.timeline);
+        LinearLayout timeline = (LinearLayout) view.findViewById(R.id.timeline);
         params = new FrameLayout.LayoutParams(300,250);
         dodajSliku();
         dodajPrograme();

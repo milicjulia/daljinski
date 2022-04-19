@@ -2,13 +2,9 @@ package com.example.daljinski.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.os.Build;
 import android.util.Log;
-
 import com.example.daljinski.MainActivity;
-
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 public  class ConnectThread extends Thread {
@@ -20,7 +16,6 @@ public  class ConnectThread extends Thread {
         Log.d(ConnectTag, "Started.");
         MainActivity.mmDevice = device;
         try {
-            //   mmSocket = (BluetoothSocket) MainActivity.mmDevice.getClass().getMethod("createInsecureRfcommSocket", new Class[]{int.class}).invoke(MainActivity.mmDevice, 1);
             mmSocket = MainActivity.mmDevice.createRfcommSocketToServiceRecord(myuuid);
 
         } catch (IOException e) {
@@ -30,7 +25,6 @@ public  class ConnectThread extends Thread {
 
     public void run() {
         Log.i(ConnectTag, "Run");
-
         try {
             MainActivity.bluetoothAdapter.cancelDiscovery();
             mmSocket.connect();

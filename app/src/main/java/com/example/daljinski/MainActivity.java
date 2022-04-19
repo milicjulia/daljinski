@@ -45,13 +45,10 @@ import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
-    private TabItem meni1, meni2, meni3;
     public static TabLayout tab;
     private static ArrayList<Channel> channels = new ArrayList<>();
     private static ArrayList<OmiljeniEntity> likes = new ArrayList<>();
-    public BazaDatabase db;
-    private ChannelDAO channelDao;
-    private ProgramDAO programDao;
+    private BazaDatabase db;
     private OmiljeniDAO omiljeniDAO;
     private ZanrDAO zanroviDAO;
     private ZanrProgramDAO zanrProgramDAO;
@@ -77,11 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
         ucitajJSONKanale(getApplicationContext());
         poveziSaDAO();
-        channelFragment=new ChannelFragment();
-        meniFragment=new MeniFragment();
-        bluetoothFragment=new BluetoothFragment();
-        recommendedFragment=new RecommendedFragment();
-        dodajKomponenteMeni();
         dodajKomponenteMeni();
 
     }
@@ -98,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void poveziSaDAO() {
-        channelDao = db.channelDao();
-        programDao = db.programDao();
+        ChannelDAO channelDao = db.channelDao();
+        ProgramDAO programDao = db.programDao();
         omiljeniDAO = db.omiljeniDAO();
         zanroviDAO = db.zanrDAO();
         zanrProgramDAO = db.zanrProgramDAO();
@@ -123,9 +115,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void dodajKomponenteMeni() {
-        meni1 = (TabItem) findViewById(R.id.meni1);
-        meni2 = (TabItem) findViewById(R.id.meni2);
-        meni3 = (TabItem) findViewById(R.id.meni3);
+        channelFragment=new ChannelFragment();
+        meniFragment=new MeniFragment();
+        bluetoothFragment=new BluetoothFragment();
+        recommendedFragment=new RecommendedFragment();
+
+        TabItem meni1 = (TabItem) findViewById(R.id.meni1);
+        TabItem meni2 = (TabItem) findViewById(R.id.meni2);
+        TabItem meni3 = (TabItem) findViewById(R.id.meni3);
         tab = (TabLayout) findViewById(R.id.tab);
         tab.getTabAt(1).select();
         loadFragment(meniFragment);
@@ -145,18 +142,13 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
             }
-
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
+            public void onTabUnselected(TabLayout.Tab tab) { }
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
+            public void onTabReselected(TabLayout.Tab tab) { }
         });
         loadFragment(bluetoothFragment);
         tab.setVisibility(View.INVISIBLE);
-
     }
 
 
@@ -188,8 +180,6 @@ public class MainActivity extends AppCompatActivity {
         for (OmiljeniEntity like : likes) {
             omiljeniDAO.insertOmiljen(like);
         }
-
-
     }
 
 
@@ -203,8 +193,6 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < channelsList.size(); i++) {
                 channels.add(parseChannelObject((JSONObject) channelsList.get(i)));
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }

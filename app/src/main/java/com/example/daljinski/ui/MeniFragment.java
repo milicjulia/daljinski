@@ -43,19 +43,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 public class MeniFragment extends Fragment implements RecognitionListener {
-    private Button chUp, chDown, volUp, volDown, S, bluetooth;
+    private Button S;
     private static int volume = 50, channel = 1;
     private TextView txt1, txt2, returnedText;
     private SpeechRecognizer speech = null;
     private Intent recognizerIntent;
     private String LOG_TAG = "VoiceRecognitionActivity";
     private static final int REQUEST_INTERNET = 200;
-    private ImageView bluetoothSlika;
     View view;
-
-    public static int getChannel() {
-        return channel;
-    }
 
     public static void setChannel(int channel) {
         MeniFragment.channel = channel;
@@ -86,11 +81,11 @@ public class MeniFragment extends Fragment implements RecognitionListener {
     }
 
     public void dodajKomponente() {
-        bluetooth = (Button) view.findViewById(R.id.bluetoothButton);
-        chUp = (Button) view.findViewById(R.id.chup);
-        chDown = (Button) view.findViewById(R.id.chdown);
-        volUp = (Button) view.findViewById(R.id.volup);
-        volDown = (Button) view.findViewById(R.id.voldown);
+        Button bluetooth = (Button) view.findViewById(R.id.bluetoothButton);
+        Button chUp = (Button) view.findViewById(R.id.chup);
+        Button chDown = (Button) view.findViewById(R.id.chdown);
+        Button volUp = (Button) view.findViewById(R.id.volup);
+        Button volDown = (Button) view.findViewById(R.id.voldown);
         S = (Button) view.findViewById(R.id.speechButton);
         txt1 = (TextView) view.findViewById(R.id.txt1);
         txt2 = (TextView) view.findViewById(R.id.txt2);

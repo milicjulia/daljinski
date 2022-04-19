@@ -20,8 +20,6 @@ import com.google.android.material.button.MaterialButton;
 
 public class ProgramFragment extends Fragment {
     private LinearLayout sv, ly;
-    private MaterialButton gledaj;
-    private Button o;
     FrameLayout.LayoutParams paramsSlike,paramsTxt;
     private static int id = 0;
     private int myid = id++;
@@ -92,7 +90,7 @@ public class ProgramFragment extends Fragment {
 
     public void dodajDugmeGledaj(int k) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            gledaj = (MaterialButton) new MaterialButton(this.getContext());
+            MaterialButton gledaj = (MaterialButton) new MaterialButton(this.getContext());
             gledaj.setText("Gledaj");
             gledaj.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -112,7 +110,7 @@ public class ProgramFragment extends Fragment {
 
     public void dodajDugmeOmiljen(int k, int p) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            o = (Button) new Button(this.getContext());
+            Button o = (Button) new Button(this.getContext());
             o.setLayoutParams(paramsSlike);
             o.setBackground(ChannelFragment.getSrceSlika().getDrawable());
             o.setOnClickListener(new View.OnClickListener() {
