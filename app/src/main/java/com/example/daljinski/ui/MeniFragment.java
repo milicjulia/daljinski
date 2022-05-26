@@ -190,7 +190,14 @@ public class MeniFragment extends Fragment implements RecognitionListener {
             volume += 5;
         txt1.setText(String.valueOf(volume));
         try {
-            MainActivity.mConnectedThread.queue.put(3);
+            if(MainActivity.mConnectedThread!=null){
+                Log.d("queue", "mcon not null");
+                if(MainActivity.mConnectedThread.queue!=null){
+                    Log.d("queue", "queue not null");
+                    MainActivity.mConnectedThread.queue.put(3);
+                }
+            }
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
