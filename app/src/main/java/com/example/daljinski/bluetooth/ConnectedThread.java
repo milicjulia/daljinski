@@ -4,10 +4,12 @@ import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ConnectedThread extends Thread {
-    public  LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
+    public LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<Integer>();
+
     private final BluetoothSocket mmSocket;
     private final OutputStream mmOutStream;
     private String ConnectedTag = "ConnectedThread";
@@ -64,7 +66,7 @@ public class ConnectedThread extends Thread {
     }
 
     public void play(int command) {
-        Log.d(ConnectedTag, "play");
+        Log.d(ConnectedTag, "play");//5*10+k+1
         try {
             mmOutStream.write(command);
         } catch (IOException e) {

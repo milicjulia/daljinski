@@ -175,8 +175,8 @@ public class MeniFragment extends Fragment implements RecognitionListener {
     }
 
     public void volumeDown() {
-        if (volume <= 100 && volume >= 5)
-            volume -= 5;
+        if (volume <= 100 && volume >= 1)
+            volume -= 1;
         txt1.setText(String.valueOf(volume));
         try {
             MainActivity.mConnectedThread.queue.put(4);
@@ -186,8 +186,8 @@ public class MeniFragment extends Fragment implements RecognitionListener {
     }
 
     public void volumeUp() {
-        if (volume <= 95 && volume >= 0)
-            volume += 5;
+        if (volume <100 && volume >= 0)
+            volume += 1;
         txt1.setText(String.valueOf(volume));
         try {
             if(MainActivity.mConnectedThread!=null){
