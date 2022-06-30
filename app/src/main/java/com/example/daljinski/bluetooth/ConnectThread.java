@@ -2,7 +2,11 @@ package com.example.daljinski.bluetooth;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
+
 import com.example.daljinski.MainActivity;
 import java.io.IOException;
 import java.util.UUID;
@@ -23,6 +27,7 @@ public  class ConnectThread extends Thread {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void run() {
         Log.i(ConnectTag, "Run");
         try {

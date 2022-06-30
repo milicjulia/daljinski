@@ -1,32 +1,23 @@
 package com.example.daljinski.ui;
 
-import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.core.app.ActivityCompat;
-
+import androidx.annotation.RequiresApi;
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
 import com.example.daljinski.bluetooth.ConnectThread;
@@ -35,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Set;
-
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class BluetoothFragment extends Fragment {
     public View view;
     public Button b1, b2;
@@ -127,14 +118,15 @@ public class BluetoothFragment extends Fragment {
                 txt.setPadding(10,pos,50,50);
                 pos+=50;
                 txt.setOnClickListener(new View.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
                     @Override public void onClick(View v) {
                         Log.i("Bluetooth", "clicked");
                         Log.e("Bluetooth", "" + bt.getName());
                         ConnectThread connect = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                       // if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                             connect = new ConnectThread(bt, bt.getUuids()[0].getUuid());
                             Log.d("UUID",bt.getUuids()[0].getUuid().toString());
-                        }
+                      //  }
                         connect.start();
                         loadFragment();
 
@@ -146,6 +138,7 @@ public class BluetoothFragment extends Fragment {
 
         }
     }
+
 
     public void loadFragment(){
         FragmentManager fm = getFragmentManager();

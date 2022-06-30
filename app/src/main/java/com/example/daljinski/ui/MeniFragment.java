@@ -26,7 +26,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -41,7 +43,7 @@ import com.google.android.material.button.MaterialButton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MeniFragment extends Fragment implements RecognitionListener {
     private Button S;
     private static int volume = 50, channel = 1;
@@ -153,22 +155,27 @@ public class MeniFragment extends Fragment implements RecognitionListener {
     }
 
 
+
     public void channelDown() {
         if (channel != 1)
             channel -= 1;
         txt2.setText(String.valueOf(channel));
         try {
-            MainActivity.mConnectedThread.queue.put(2);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                MainActivity.mConnectedThread.queue.put(2);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
+
     public void channelUp() {
         channel += 1;
         txt2.setText(String.valueOf(channel));
         try {
-            MainActivity.mConnectedThread.queue.put(1);
+                MainActivity.mConnectedThread.queue.put(1);
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -178,7 +185,7 @@ public class MeniFragment extends Fragment implements RecognitionListener {
         if (volume <= 100 && volume >= 1)
             volume -= 1;
         txt1.setText(String.valueOf(volume));
-        try {
+       try {
             MainActivity.mConnectedThread.queue.put(4);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -313,10 +320,11 @@ public class MeniFragment extends Fragment implements RecognitionListener {
                 }
                 if (pretraga != null) {
                     MeniFragment.setChannel(pretraga.getIdKanala());
-                    MainActivity.mConnectedThread.queue.put(5 * 10 + pretraga.getIdKanala());
-                    Log.d("prikazuje ", String.valueOf(pretraga.getIdKanala()));
-                    Log.d("prikazuje ", pretraga.getName());
-                    Log.d("prikazuje ", pretraga.getDescription());
+
+                        MainActivity.mConnectedThread.queue.put(5 * 10 + pretraga.getIdKanala());
+
+                    Toast.makeText(view.getContext(), String.valueOf(pretraga.getIdKanala())+"  "+ pretraga.getName(),Toast.LENGTH_LONG).show();
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

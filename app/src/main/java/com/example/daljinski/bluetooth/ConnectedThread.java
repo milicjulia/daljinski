@@ -1,14 +1,21 @@
 package com.example.daljinski.bluetooth;
 
 import android.bluetooth.BluetoothSocket;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
 
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class ConnectedThread extends Thread {
     public LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<Integer>();
+   // public LinkedTransferQueue<Integer> queue=new LinkedTransferQueue<Integer>();
 
     private final BluetoothSocket mmSocket;
     private final OutputStream mmOutStream;
@@ -18,7 +25,7 @@ public class ConnectedThread extends Thread {
         Log.d(ConnectedTag, "Starting");
         mmSocket = socket;
         OutputStream tmpOut = null;
-
+      //  queue=new LinkedTransferQueue<Integer>();
         try {
             tmpOut = mmSocket.getOutputStream();
         } catch (IOException e) {

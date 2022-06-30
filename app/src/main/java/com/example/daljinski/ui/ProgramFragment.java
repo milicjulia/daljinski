@@ -13,6 +13,9 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
+
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
 import java.sql.Timestamp;
@@ -88,23 +91,26 @@ public class ProgramFragment extends Fragment {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void dodajDugmeGledaj(int k) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+     //   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             MaterialButton gledaj = (MaterialButton) new MaterialButton(this.getContext());
             gledaj.setText("Gledaj");
             gledaj.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onClick(View view) {
-                    MeniFragment.setChannel(k + 1);
+
                     try {
                         MainActivity.mConnectedThread.queue.put(5*10+k+1);
+                        MeniFragment.setChannel(k + 1);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             });
             ly.addView(gledaj);
-        }
+     //   }
 
     }
 
