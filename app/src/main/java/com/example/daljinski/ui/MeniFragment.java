@@ -43,6 +43,8 @@ import com.google.android.material.button.MaterialButton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
+
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MeniFragment extends Fragment implements RecognitionListener {
     private Button S;
@@ -233,6 +235,36 @@ public class MeniFragment extends Fragment implements RecognitionListener {
         }
     }
 
+    public static void removeOmiljen(int k, int p){
+        List<Integer> todelete=new ArrayList<>();
+        Program program = MainActivity.getChannels().get(k).getPrograms().get(p);
+            for (int i = 0; i < program.getGenres().size(); i++) {
+                boolean found = false;
+                for (OmiljeniEntity element : MainActivity.getLikes()) {
+                    if (element.getTip().compareToIgnoreCase(program.getGenres().get(i)) == 0) {
+                        found = true;
+                       // break;
+                    }
+                    if (found == true) {
+                        for(int j=0;j<MainActivity.getLikes().size();j++){
+                          //  boolean found2=false;
+                            if(MainActivity.getLikes().get(j).getTip().compareTo((program.getGenres().get(i)))==0){
+                              //  found2=true;
+                                todelete.add(j);
+
+                                break;
+                            }
+                        }
+
+                    }
+                }
+            }
+            for(Integer d:todelete){
+                MainActivity.getLikes().remove(d);
+            }
+        }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -295,13 +327,20 @@ public class MeniFragment extends Fragment implements RecognitionListener {
     public void onResults(Bundle results) {
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 
-        if (matches.get(0).compareToIgnoreCase("channel up") == 0) channelUp();
-        else if (matches.get(0).compareToIgnoreCase("channel down") == 0) channelDown();
-        else if (matches.get(0).compareToIgnoreCase("volume up") == 0) volumeUp();
-        else if (matches.get(0).compareToIgnoreCase("volume down") == 0) volumeDown();
+        if (matches.get(0).compareToIgnoreCase("channel up") == 0)
+            channelUp();
+        else if (matches.get(0).compareToIgnoreCase("channel down") == 0)
+            channelDown();
+        else if (matches.get(0).compareToIgnoreCase("volume up") == 0)
+            volumeUp();
+        else if (matches.get(0).compareToIgnoreCase("volume down") == 0)
+            volumeDown();
         else {
             try {
-                String akcija = Translator.translate(matches.get(0));
+                Log.d("EEEE1",matches.get(0));
+                Translator t=new Translator(matches.get(0));
+            /*    String akcija =t.getOutput();
+                        Log.d("EEEE2",akcija);
                 Program pretraga = null;
                 for (Channel ch : MainActivity.getChannels()) {
                     for (Program p : ch.getPrograms()) {
@@ -324,8 +363,9 @@ public class MeniFragment extends Fragment implements RecognitionListener {
                         MainActivity.mConnectedThread.queue.put(5 * 10 + pretraga.getIdKanala());
 
                     Toast.makeText(view.getContext(), String.valueOf(pretraga.getIdKanala())+"  "+ pretraga.getName(),Toast.LENGTH_LONG).show();
+                    Log.d("EEEE3",pretraga.getIdKanala()+"  "+ pretraga.getName());
 
-                }
+                }*/
             } catch (Exception e) {
                 e.printStackTrace();
             }

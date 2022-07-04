@@ -3,6 +3,7 @@ package com.example.daljinski.ui;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
 import androidx.room.Room;
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
@@ -42,6 +45,7 @@ public class RecommendedFragment extends Fragment {
     private int ids[] = {R.id.naziv1,  R.id.vreme1, R.id.opis1, R.id.gledaj1, R.id.naziv2, R.id.vreme2, R.id.opis2, R.id.gledaj2, R.id.naziv3,  R.id.vreme3, R.id.opis3, R.id.gledaj3};
     View view;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_recommended, container, false);
@@ -59,6 +63,7 @@ public class RecommendedFragment extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void dodajPodatke(View view) {
         int i = 0;
         Timestamp time;
@@ -69,6 +74,7 @@ public class RecommendedFragment extends Fragment {
             opis.get(i).setText(p.getDescription());
             int finalI = i;
             gledaj.get(i).setOnTouchListener(new View.OnTouchListener() {
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @SuppressLint("ClickableViewAccessibility")
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
@@ -89,6 +95,7 @@ public class RecommendedFragment extends Fragment {
 
     ArrayList<Program> p = new ArrayList<>();
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void addRandom(int size) {
         int s = 3 - size;
         int ch, pro;
@@ -108,6 +115,7 @@ public class RecommendedFragment extends Fragment {
         return temp;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public ArrayList<Program> recommend() {
 
         if (MainActivity.getLikes().size() == 0) addRandom(0);
@@ -144,7 +152,7 @@ public class RecommendedFragment extends Fragment {
             }
 
             for (ProgramEntity pe : programEntities) {
-                Program pp = new Program(pe.getObjectType(), pe.getDescription(), pe.getEndDate(), pe.getId(), pe.getName(), pe.getStartDate(), new ArrayList<String>());
+                Program pp = new Program(pe.getObjectType(), pe.getDescription(), pe.getEndDate(), pe.getId(), pe.getName(), pe.getStartDate(), new ArrayList<String>(),false);
                 pp.setIdKanala(pe.getIdKanala());
                 p.add(pp);
             }

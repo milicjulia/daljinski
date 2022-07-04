@@ -11,6 +11,7 @@ public class Program {
 	private String name;
 	private long startDate;
 	private int idKanala;
+	private boolean omiljen;
 
 	public String getObjectType() {
 		return objectType;
@@ -52,6 +53,14 @@ public class Program {
 		this.id = id;
 	}
 
+	public boolean getOmiljen() {
+		return omiljen;
+	}
+
+	public void setOmiljen(boolean omiljen) {
+		this.omiljen = omiljen;
+	}
+
 	public int getIdKanala() {
 		return idKanala;
 	}
@@ -82,7 +91,7 @@ public class Program {
 
 	ArrayList<String> genres;
 	
-	public Program(String objectType, String description, long endDate, long id, String name, long startDate, ArrayList<String> genres) {
+	public Program(String objectType, String description, long endDate, long id, String name, long startDate, ArrayList<String> genres, boolean omiljen) {
 		this.objectType=objectType;
 		this.description=description;
 		this.endDate=endDate;
@@ -90,6 +99,7 @@ public class Program {
 		this.name=name;
 		this.startDate=startDate;
 		this.genres=genres;
+		this.omiljen=omiljen;
 	}
 	
 	

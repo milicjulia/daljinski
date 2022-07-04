@@ -16,6 +16,7 @@ public class ProgramEntity {
     private String name;
     private long startDate;
     private int idKanala;
+    private boolean omiljen = false;
 
     public ProgramEntity(Program p) {
         this.id=p.getId();
@@ -26,6 +27,7 @@ public class ProgramEntity {
         this.name = p.getName();
         this.startDate = p.getStartDate();
         this.idKanala = p.getIdKanala();
+        this.omiljen=p.getOmiljen();
     }
     public ProgramEntity() {}
 
@@ -91,6 +93,14 @@ public class ProgramEntity {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public boolean getOmiljen() {
+        return omiljen;
+    }
+
+    public void setOmiljen(boolean omiljen) {
+        this.omiljen = omiljen;
     }
 
 

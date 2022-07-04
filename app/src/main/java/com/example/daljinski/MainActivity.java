@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
             for (int j = 0; j < chi.getPrograms().size(); j++) {
                 Program pj = chi.getPrograms().get(j);
                 channels.get(i).getPrograms().get(j).setIdKanala(i + 1);
+                channels.get(i).getPrograms().get(j).setOmiljen(pj.getOmiljen());
                 pj.setId(i * 24 + j + 1);
                 programDao.insertProgram(new ProgramEntity(pj));
                 for (String s : pj.getGenres()) {
@@ -220,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < objectArray.size(); i++) {
                 genre.add((String) ((JSONObject) objectArray.get(i)).get("value"));
             }
-            return new Program(objectType, description, endDate, id, name, startDate, genre);
+            return new Program(objectType, description, endDate, id, name, startDate, genre, false);
         } catch (Exception e) {
             e.printStackTrace();
         }

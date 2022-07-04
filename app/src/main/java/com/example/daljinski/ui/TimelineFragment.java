@@ -3,6 +3,7 @@ package com.example.daljinski.ui;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -14,6 +15,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.example.daljinski.MainActivity;
@@ -39,6 +41,7 @@ public class TimelineFragment extends Fragment {
     int mojid = id++;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_timeline, container, false);
@@ -69,6 +72,7 @@ public class TimelineFragment extends Fragment {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void dodajPrograme() {
         int brprograma= MainActivity.getChannels().get(mojid).getPrograms().size();
         for(int k=0;k<brprograma;k++){

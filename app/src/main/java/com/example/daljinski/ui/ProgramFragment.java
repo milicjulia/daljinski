@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.RequiresApi;
 
 import com.example.daljinski.MainActivity;
@@ -29,6 +30,7 @@ public class ProgramFragment extends Fragment {
     View view;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_program, container, false);
@@ -120,15 +122,29 @@ public class ProgramFragment extends Fragment {
             o.setLayoutParams(paramsSlike);
             o.setBackground(ChannelFragment.getSrceSlika().getDrawable());
             o.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onClick(View view) {
-                    MeniFragment.setOmiljen(k, p);
 
+                  if(MainActivity.getChannels().get(k).getPrograms().get(p).getOmiljen()==false){
+                      MeniFragment.setOmiljen(k, p);
+                      ChannelFragment.getSrceSlika().getDrawable().setTint(Color.RED);
+                      MainActivity.getChannels().get(k).getPrograms().get(p).setOmiljen(true);
+                    }
+                    else{
+                      ChannelFragment.getSrceSlika().getDrawable().setTint(Color.BLACK);
+                      MainActivity.getChannels().get(k).getPrograms().get(p).setOmiljen(false);
+                      MeniFragment.removeOmiljen(k,p);
+                    }
                 }
             });
             ly.addView(o);
         }
 
+    }
+
+    public boolean omiljenJe(int k, int p){
+        return true;
     }
 
 
