@@ -7,15 +7,21 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
+
 import com.example.daljinski.baza.BazaDatabase;
 import com.example.daljinski.baza.ChannelDAO;
 import com.example.daljinski.baza.ChannelEntity;
@@ -34,14 +40,16 @@ import com.example.daljinski.ui.ChannelFragment;
 import com.example.daljinski.ui.MeniFragment;
 import com.example.daljinski.entiteti.Program;
 import com.example.daljinski.ui.RecommendedFragment;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.google.android.material.tabs.TabItem;
@@ -56,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private OmiljeniDAO omiljeniDAO;
     private ZanrDAO zanroviDAO;
     private ZanrProgramDAO zanrProgramDAO;
+    public static ProgramDAO programDAO;
     public static BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     public static BluetoothDevice mmDevice;
     public static ConnectedThread mConnectedThread;
@@ -73,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         db = Room.databaseBuilder(getApplicationContext(), BazaDatabase.class, "database-name").allowMainThreadQueries().build();
 
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -82,20 +92,40 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void off() {
-        MainActivity.bluetoothAdapter.disable();
-        Toast.makeText(getApplicationContext(), "Turned off", Toast.LENGTH_LONG).show();
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fm.beginTransaction();
-        fragmentTransaction.replace(R.id.frame, bluetoothFragment);
-        fragmentTransaction.commit();
-        MainActivity.tab.setVisibility(View.INVISIBLE);
+    public static ImageView srceSlika[] = new ImageView[48];
+
+    public static ImageView[] getSrceSlika() {
+        return srceSlika;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public static void setSrceSlikaColor(int k, int p, int tint) {
+        srceSlika[k * 24 + p].getDrawable().setTint(tint);
+    }
+
+
+    public static void dodajSliku(int k, int p) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            srceSlika[k * 24 + p] = new ImageView(channelFragment.getContext());
+            srceSlika[k * 24 + p].setLayoutParams(new FrameLayout.LayoutParams(25, 25, Gravity.LEFT));
+            try {
+                InputStream istr = channelFragment.getContext().getAssets().open("heart.png");
+                srceSlika[k * 24 + p].setImageDrawable(Drawable.createFromStream(istr, null));
+                if (getChannels().get(k).getPrograms().get(p).getOmiljen()) {
+                    setSrceSlikaColor(k, p, Color.RED);
+                } else setSrceSlikaColor(k, p, Color.BLACK);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
 
     }
 
     public void poveziSaDAO() {
         ChannelDAO channelDao = db.channelDao();
-        ProgramDAO programDao = db.programDao();
+        programDAO = db.programDao();
         omiljeniDAO = db.omiljeniDAO();
         zanroviDAO = db.zanrDAO();
         zanrProgramDAO = db.zanrProgramDAO();
@@ -107,10 +137,10 @@ public class MainActivity extends AppCompatActivity {
                 channels.get(i).getPrograms().get(j).setIdKanala(i + 1);
                 channels.get(i).getPrograms().get(j).setOmiljen(pj.getOmiljen());
                 pj.setId(i * 24 + j + 1);
-                programDao.insertProgram(new ProgramEntity(pj));
+                programDAO.insertProgram(new ProgramEntity(pj));
                 for (String s : pj.getGenres()) {
                     zanroviDAO.insertZanr(new ZanroviEntity(s));
-                    zanrProgramDAO.insertZanrProgram(new ZanrProgramEntity(programDao.getIdProgram(pj.getId()), s));
+                    zanrProgramDAO.insertZanrProgram(new ZanrProgramEntity(programDAO.getIdProgram(pj.getId()), s));
                 }
             }
         }
@@ -120,10 +150,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void dodajKomponenteMeni() {
-        channelFragment=new ChannelFragment();
-        meniFragment=new MeniFragment();
-        bluetoothFragment=new BluetoothFragment();
-        recommendedFragment=new RecommendedFragment();
+        channelFragment = new ChannelFragment();
+        meniFragment = new MeniFragment();
+        bluetoothFragment = new BluetoothFragment();
+        recommendedFragment = new RecommendedFragment();
 
         TabItem meni1 = (TabItem) findViewById(R.id.meni1);
         TabItem meni2 = (TabItem) findViewById(R.id.meni2);
@@ -147,10 +177,14 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
             }
+
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) { }
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
             @Override
-            public void onTabReselected(TabLayout.Tab tab) { }
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
         });
         loadFragment(bluetoothFragment);
         tab.setVisibility(View.INVISIBLE);
@@ -181,9 +215,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        off();
         for (OmiljeniEntity like : likes) {
-            omiljeniDAO.insertOmiljen(like);
+            omiljeniDAO.update(like.getKolicina(), like.getTip());
+        }
+        for (Channel ch:getChannels()){
+            for(Program p: ch.getPrograms()) {
+                programDAO.updateProgramOmiljen(p.getId(),p.getOmiljen());
+            }
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        for (OmiljeniEntity like : likes) {
+            omiljeniDAO.update(like.getKolicina(), like.getTip());
+        }
+        for (Channel ch:getChannels()){
+            for(Program p: ch.getPrograms()) {
+                programDAO.updateProgramOmiljen(p.getId(),p.getOmiljen());
+            }
         }
     }
 

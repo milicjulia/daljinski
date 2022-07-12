@@ -2,6 +2,7 @@ package com.example.daljinski.ui;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.annotation.RequiresApi;
+
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
 
@@ -25,38 +28,20 @@ public class ChannelFragment extends Fragment {
     View view;
     private LinearLayout layout;
     static ArrayList<FrameLayout> frames = new ArrayList<>();
-    static ImageView srceSlika;
 
 
-    public static ImageView getSrceSlika() {
-        return srceSlika;
-    }
 
-    public void dodajSliku() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            srceSlika = new ImageView(this.getContext());
-            srceSlika.setLayoutParams(new FrameLayout.LayoutParams(25, 25, Gravity.LEFT));
-            try {
-                InputStream istr = getContext().getAssets().open("heart.png");
-                srceSlika.setImageDrawable(Drawable.createFromStream(istr, null));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    }
-
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_channel, container, false);
         layout = (LinearLayout) view.findViewById(R.id.linearlayout1);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 250, Gravity.CENTER);
-        dodajSliku();
         dodajKanale(params);
         return view;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void dodajKanale(ViewGroup.LayoutParams params) {
         int brkonala = MainActivity.getChannels().size();
         for (int i = 0; i < brkonala; i++) {

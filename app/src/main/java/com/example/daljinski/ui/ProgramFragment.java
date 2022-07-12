@@ -3,14 +3,17 @@ package com.example.daljinski.ui;
 import android.app.Fragment;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -19,6 +22,9 @@ import androidx.annotation.RequiresApi;
 
 import com.example.daljinski.MainActivity;
 import com.example.daljinski.R;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import com.google.android.material.button.MaterialButton;
 
@@ -33,6 +39,7 @@ public class ProgramFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+      //  Log.d("ProgramFragment","onCreateView");
         view = inflater.inflate(R.layout.fragment_program, container, false);
         sv = (LinearLayout) view.findViewById(R.id.programlayout);
         paramsSlike=new FrameLayout.LayoutParams(90, 90, Gravity.RIGHT);
@@ -51,18 +58,23 @@ public class ProgramFragment extends Fragment {
                         ly.setLayoutParams(layoutParams);
                         layoutParams.gravity = Gravity.RIGHT;
                         dodajDugmeGledaj(j);
+                        MainActivity.dodajSliku(j,k);
                         dodajDugmeOmiljen(j, k);
+
                         sv.addView(ly);
                     }
 
                 }
                 dosad += 1;
+
             }
 
         }
         return view;
 
     }
+
+
 
     public static void setId(int id) {
         ProgramFragment.id = id;
@@ -95,7 +107,7 @@ public class ProgramFragment extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void dodajDugmeGledaj(int k) {
-     //   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+       // Log.d("ProgramFragment","dodajDugmeGledaj");
             MaterialButton gledaj = (MaterialButton) new MaterialButton(this.getContext());
             gledaj.setText("Gledaj");
             gledaj.setOnClickListener(new View.OnClickListener() {
@@ -112,30 +124,38 @@ public class ProgramFragment extends Fragment {
                 }
             });
             ly.addView(gledaj);
-     //   }
+
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void dodajDugmeOmiljen(int k, int p) {
+        Log.d("ProgramFragment","dodajDugmeOmiljen");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Button o = (Button) new Button(this.getContext());
             o.setLayoutParams(paramsSlike);
-            o.setBackground(ChannelFragment.getSrceSlika().getDrawable());
+            o.setBackground(MainActivity.getSrceSlika()[k*24+p].getDrawable());
             o.setOnClickListener(new View.OnClickListener() {
                 @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onClick(View view) {
-
+                  //  Log.d("ProgramFragment","onclick "+k+" "+p);
                   if(MainActivity.getChannels().get(k).getPrograms().get(p).getOmiljen()==false){
+                      Log.d("ProgramFragment","omiljen false");
                       MeniFragment.setOmiljen(k, p);
-                      ChannelFragment.getSrceSlika().getDrawable().setTint(Color.RED);
+                      MainActivity.setSrceSlikaColor(k,p,Color.RED);
+
                       MainActivity.getChannels().get(k).getPrograms().get(p).setOmiljen(true);
+                      MainActivity.programDAO.updateProgramOmiljen(MainActivity.getChannels().get(k).getPrograms().get(p).getId(),true);
                     }
                     else{
-                      ChannelFragment.getSrceSlika().getDrawable().setTint(Color.BLACK);
+                      Log.d("ProgramFragment","omiljen true");
+                      MainActivity.setSrceSlikaColor(k,p,Color.BLACK);
                       MainActivity.getChannels().get(k).getPrograms().get(p).setOmiljen(false);
                       MeniFragment.removeOmiljen(k,p);
-                    }
+                      MainActivity.programDAO.updateProgramOmiljen(MainActivity.getChannels().get(k).getPrograms().get(p).getId(),false);
+
+                  }
                 }
             });
             ly.addView(o);

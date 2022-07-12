@@ -25,4 +25,7 @@ public interface ProgramDAO {
 
     @Query("DELETE FROM ProgramEntity")
     void deleteAllPrograms();
+
+    @Query("UPDATE ProgramEntity set  omiljen=:omiljenn WHERE id=:idp")
+    void updateProgramOmiljen(long idp, boolean omiljenn);
 }

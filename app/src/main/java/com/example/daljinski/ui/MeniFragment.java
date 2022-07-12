@@ -339,33 +339,6 @@ public class MeniFragment extends Fragment implements RecognitionListener {
             try {
                 Log.d("EEEE1",matches.get(0));
                 Translator t=new Translator(matches.get(0));
-            /*    String akcija =t.getOutput();
-                        Log.d("EEEE2",akcija);
-                Program pretraga = null;
-                for (Channel ch : MainActivity.getChannels()) {
-                    for (Program p : ch.getPrograms()) {
-                        if (p.getName().contains(akcija)) {
-                            pretraga = p;
-                            break;
-                        } else if (p.getGenres().contains(akcija)) {
-                            pretraga = p;
-                            break;
-                        } else if (p.getDescription().contains(akcija)) {
-                            pretraga = p;
-                            break;
-                        }
-                    }
-                    if (pretraga != null) break;
-                }
-                if (pretraga != null) {
-                    MeniFragment.setChannel(pretraga.getIdKanala());
-
-                        MainActivity.mConnectedThread.queue.put(5 * 10 + pretraga.getIdKanala());
-
-                    Toast.makeText(view.getContext(), String.valueOf(pretraga.getIdKanala())+"  "+ pretraga.getName(),Toast.LENGTH_LONG).show();
-                    Log.d("EEEE3",pretraga.getIdKanala()+"  "+ pretraga.getName());
-
-                }*/
             } catch (Exception e) {
                 e.printStackTrace();
             }
